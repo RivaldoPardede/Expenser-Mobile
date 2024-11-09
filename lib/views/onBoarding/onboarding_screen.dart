@@ -1,7 +1,10 @@
+import 'package:final_project/views/auth/country_selection_page.dart';
 import 'package:flutter/material.dart';
 import 'onboarding_page.dart';
 
 class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
 }
@@ -16,7 +19,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       subtitle: "Welcome to our app, your best way to get financial freedom.",
       buttonText: "Get Started",
       imagePath: "images/ilogo.png",
-      isFirstPage: true, // Set true untuk halaman pertama
+      isFirstPage: true,
       onNext: _nextPage,
     ),
     OnboardingPage(
@@ -56,7 +59,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       subtitle: "Review detailed monthly financial reports.",
       buttonText: "Let’s Start",
       imagePath: "images/io_5.png",
-      isLastPage: true, // Set true untuk halaman terakhir
+      isLastPage: true,
       onNext: _nextPage,
     )
   ];
@@ -64,28 +67,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _nextPage() {
     if (_currentPage < _pages.length - 1) {
       _controller.nextPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
-      // Tambahkan logika navigasi ke halaman utama
-      // Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
+      );
     }
   }
 
   void _goToLastPage() {
-    _controller.jumpToPage(_pages.length - 1); // Lompat ke halaman terakhir
+    _controller.jumpToPage(_pages.length - 1);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Expanded(
             child: PageView.builder(
               controller: _controller,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (int page) {
                 setState(() {
                   _currentPage = page;
@@ -95,13 +101,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               itemBuilder: (context, index) => _pages[index],
             ),
           ),
-          if (_currentPage > 0) // Hanya tampilkan indikator halaman jika bukan halaman pertama
+          if (_currentPage > 0)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_pages.length - 1, (index) { // Kurangi 1 dari itemCount
+              children: List.generate(_pages.length - 1, (index) {
                 return Container(
-                  margin: EdgeInsets.all(4),
-                  width: _currentPage == index + 1 ? 12 : 8, // Sesuaikan index
+                  margin: const EdgeInsets.all(4),
+                  width: _currentPage == index + 1 ? 12 : 8,
                   height: 8,
                   decoration: BoxDecoration(
                     color: _currentPage == index + 1 ? Colors.blue : Colors.grey,
@@ -110,7 +116,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 );
               }),
             ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
         ],
       ),
     );
