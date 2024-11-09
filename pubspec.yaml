@@ -13,6 +13,8 @@ dependencies:
 
   device_preview: 1.2.0
   cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.14
+  currency_picker: ^2.0.21
 
 dev_dependencies:
   flutter_test:
@@ -25,12 +27,7 @@ flutter:
   uses-material-design: true
 
   assets:
-   - images/ilogo.png
-   - images/io_1.png
-   - images/io_2.png
-   - images/io_3.png
-   - images/io_4.png
-   - images/io_5.png
+    - images/
 
   fonts:
     - family: Inter
