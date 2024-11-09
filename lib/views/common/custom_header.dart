@@ -21,7 +21,7 @@ class CustomHeader extends StatelessWidget {
            headerText,
             style: const TextStyle(
              fontWeight: FontWeight.w500,
-             fontSize: 24,
+             fontSize: 26,
             ),
           ),
         ),
@@ -30,7 +30,7 @@ class CustomHeader extends StatelessWidget {
           detailText,
           style: const TextStyle(
             fontWeight: FontWeight.w500,
-            fontSize: 12
+            fontSize: 14
           ),
         )
       ],
