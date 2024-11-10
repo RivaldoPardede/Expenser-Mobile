@@ -6,8 +6,8 @@ final ButtonStyle buttonPrimary = ElevatedButton.styleFrom(
   backgroundColor: blue,
   foregroundColor: Colors.white,
   elevation: 0,
-).copyWith(
-  overlayColor: MaterialStateProperty.all(Colors.transparent),
+  ).copyWith(
+    overlayColor: WidgetStateProperty.all(Colors.transparent),
 );
 
 final ButtonStyle circleButtonStyle = ElevatedButton.styleFrom(
@@ -19,6 +19,6 @@ final ButtonStyle circleButtonStyle = ElevatedButton.styleFrom(
   shape: RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(30),
   ),
-).copyWith(
-  overlayColor: MaterialStateProperty.all(Colors.transparent),
+  ).copyWith(
+    overlayColor: WidgetStateProperty.all(Colors.transparent),
 );

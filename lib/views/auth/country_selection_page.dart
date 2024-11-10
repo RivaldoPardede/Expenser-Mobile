@@ -99,15 +99,12 @@ class _CountrySelectionPageState extends State<CountrySelectionPage> {
                 style: buttonPrimary,
                 onPressed: selectedCurrency != null
                 ? () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SignupPage()),
-                  );
+
                 }
                 : null,
                 child: const Text('Continue')
-            ) // Disable button if no currency selected
-            ),
+            )
+          ),
         ],
       ),
     );
