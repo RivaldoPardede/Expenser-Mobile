@@ -1,4 +1,4 @@
-import 'package:final_project/views/auth/country_selection_page.dart';
+import 'package:final_project/views/auth/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'onboarding_page.dart';
 
@@ -73,7 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
+        MaterialPageRoute(builder: (context) => const SignupPage()),
       );
     }
   }
