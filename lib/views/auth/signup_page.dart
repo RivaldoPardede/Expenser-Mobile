@@ -7,6 +7,8 @@ import 'package:final_project/views/auth/widgets/input_field.dart';
 import 'package:final_project/views/common/custom_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:final_project/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -48,6 +50,7 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
@@ -104,11 +107,30 @@ class _SignupPageState extends State<SignupPage> {
                       child: ElevatedButton(
                         style: buttonPrimary,
                         onPressed: isFormValid
-                          ? () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
-                          );
+                          ? () async {
+                          try {
+                            await authProvider.signUp(_emailController.text, _passwordController.text);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Verification email sent! Please check your inbox."),
+                                duration: Duration(seconds: 4),
+                              ),
+                            );
+                            authProvider.startEmailVerificationCheck(() {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
+                              );
+                            });
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Failed to sign up: ${e.toString()}"),
+                                backgroundColor: Colors.red,
+                                duration: const Duration(seconds: 4),
+                              ),
+                            );
+                          }
                         }
                         : null,
                         child: const Text('Sign Up'),
