@@ -7,17 +7,18 @@ class OnboardingPage extends StatelessWidget {
   final String buttonText;
   final String imagePath;
   final bool isFirstPage;
-  final bool isLastPage; // New parameter to check if it's the last page
+  final bool isLastPage;
   final VoidCallback onNext;
   final VoidCallback? onSkip;
 
-  OnboardingPage({
+  const OnboardingPage({
+    super.key,
     required this.title,
     required this.subtitle,
     required this.buttonText,
     required this.imagePath,
     this.isFirstPage = false,
-    this.isLastPage = false, // Default to false
+    this.isLastPage = false,
     required this.onNext,
     this.onSkip,
   });
@@ -25,36 +26,34 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Stack(
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Spacer(),
+              const Spacer(),
               Image.asset(imagePath, height: 200),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               Text(
                 title,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 subtitle,
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
-              Spacer(),
-              // Spacer untuk memberikan ruang untuk button circular
-              SizedBox(height: 80),
+              const Spacer(),
+              const SizedBox(height: 80),
             ],
           ),
-          // Circular button positioned at bottom right
           Positioned(
             bottom: 0,
-            right: 16, // Jarak dari kanan
-            child: (isFirstPage || isLastPage) // Check for first or last page
+            right: 16,
+            child: (isFirstPage || isLastPage)
                 ? ElevatedButton(
               style: buttonPrimary,
               onPressed: onNext,
@@ -63,7 +62,7 @@ class OnboardingPage extends StatelessWidget {
                 : ElevatedButton(
               style: circleButtonStyle,
               onPressed: onNext,
-              child: Icon(
+              child: const Icon(
                 Icons.arrow_forward_ios,
                 color: Colors.white,
                 size: 24,
@@ -73,10 +72,10 @@ class OnboardingPage extends StatelessWidget {
           if (onSkip != null && !isFirstPage && !isLastPage)
             Positioned(
               bottom: 0,
-              left: 16, // Jarak dari kiri
+              left: 16,
               child: TextButton(
                 onPressed: onSkip,
-                child: Text(
+                child: const Text(
                   'Skip',
                   style: TextStyle(fontSize: 16, color: Colors.black),
                 ),
