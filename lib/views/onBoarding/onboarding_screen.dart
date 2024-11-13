@@ -57,7 +57,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       buttonText: "Let’s Start",
       imagePath: "images/io_5.png",
       isLastPage: true, // Set true untuk halaman terakhir
-      onNext: _nextPage,
+      onNext: _goToHome,
     )
   ];
 
@@ -72,7 +72,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       // Navigator.pushReplacementNamed(context, '/home');
     }
   }
-
+  void _goToHome() {
+    Navigator.pushReplacementNamed(context, '/home'); // Navigasi ke halaman beranda
+  }
   void _goToLastPage() {
     _controller.jumpToPage(_pages.length - 1); // Lompat ke halaman terakhir
   }

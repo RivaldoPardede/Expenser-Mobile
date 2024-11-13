@@ -1,6 +1,7 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:final_project/views/onBoarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:final_project/views/home/home.dart';
 
 void main() {
   runApp(
@@ -21,6 +22,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: OnboardingScreen(),
+      routes: {
+        '/home': (context) => HomePage(), // Tambahkan route ke halaman beranda
+      },
     );
   }
 }
