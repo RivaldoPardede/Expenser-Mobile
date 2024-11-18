@@ -1,7 +1,5 @@
-import 'package:final_project/views/home/home_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class Auth {
@@ -66,6 +64,16 @@ class Auth {
     } catch (e) {
       print("Error during Google Sign-In: $e");
       return null;
+    }
+  }
+
+  Future<bool> doesUserExist(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      return userDoc.exists;
+    } catch (e) {
+      print("Error checking user existence: $e");
+      return false;
     }
   }
 }

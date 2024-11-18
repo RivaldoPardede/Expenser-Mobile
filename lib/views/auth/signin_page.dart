@@ -5,7 +5,6 @@ import 'package:final_project/views/auth/signup_page.dart';
 import 'package:final_project/views/auth/widgets/auth_button.dart';
 import 'package:final_project/views/auth/widgets/input_field.dart';
 import 'package:final_project/views/common/custom_header.dart';
-import 'package:final_project/views/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -42,33 +41,6 @@ class _SigninPageState extends State<SigninPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _signIn(BuildContext context) async {
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      await authProvider.signInWithEmailAndPassword(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
   }
 
   @override
@@ -131,8 +103,12 @@ class _SigninPageState extends State<SigninPage> {
                       child: ElevatedButton(
                         style: buttonPrimary,
                         onPressed: isFormValid
-                            ? () async {
-                          await _signIn(context);
+                          ? () async {
+                          await Provider.of<AuthProvider>(context, listen: false).signInWithEmailAndPassword(
+                            context,
+                            _emailController.text.trim(),
+                            _passwordController.text.trim(),
+                          );
                         }: null,
                         child: isLoading
                             ? const SizedBox(

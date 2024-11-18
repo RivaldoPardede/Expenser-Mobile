@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:final_project/views/auth/country_selection_page.dart';
 import 'package:final_project/views/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/services/auth_service.dart';
@@ -30,13 +31,28 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> signInWithEmailAndPassword(String email, String password) async {
+  Future<void> signInWithEmailAndPassword(BuildContext context, String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email, password);
+      User? user = await _auth.signInWithEmailAndPassword(email, password);
+      if (user != null) {
+        bool userExists = await _auth.doesUserExist(user.uid);
+        if (userExists) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
+          );
+        }
+      }
     } catch (e) {
       throw Exception(e.toString());
     }
   }
+
 
   void startEmailVerificationCheck(Function onVerified) {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
@@ -57,16 +73,29 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
-    User? user = await _auth.signInWithGoogle();
-    if (user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Google Sign-In failed")),
-      );
+    try {
+      User? user = await _auth.signInWithGoogle();
+      if (user != null) {
+        bool userExists = await _auth.doesUserExist(user.uid);
+        if (userExists) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Google Sign-In failed")),
+        );
+      }
+    } catch (e) {
+      print("Error during Google Sign-In: $e");
     }
   }
+
 }
