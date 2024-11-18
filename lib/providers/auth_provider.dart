@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:final_project/views/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,5 +46,19 @@ class AuthProvider with ChangeNotifier {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  Future<void> signInWithGoogle(BuildContext context) async {
+    User? user = await _auth.signInWithGoogle();
+    if (user != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Google Sign-In failed")),
+      );
+    }
   }
 }
