@@ -29,6 +29,18 @@ class Auth {
     }
   }
 
+  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.message ?? "An error occurred while signing in.");
+    }
+  }
+
   Future<bool> checkEmailVerified() async{
     await currentUser?.reload();
     return currentUser?.emailVerified ?? false;

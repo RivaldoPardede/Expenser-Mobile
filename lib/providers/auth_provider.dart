@@ -30,6 +30,14 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email, password);
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
   void startEmailVerificationCheck(Function onVerified) {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       await _auth.currentUser?.reload();

@@ -1,11 +1,14 @@
+import 'package:final_project/providers/auth_provider.dart';
 import 'package:final_project/styles/button.dart';
 import 'package:final_project/styles/color.dart';
 import 'package:final_project/views/auth/signup_page.dart';
 import 'package:final_project/views/auth/widgets/auth_button.dart';
 import 'package:final_project/views/auth/widgets/input_field.dart';
 import 'package:final_project/views/common/custom_header.dart';
+import 'package:final_project/views/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class SigninPage extends StatefulWidget {
   const SigninPage({super.key});
@@ -18,6 +21,7 @@ class _SigninPageState extends State<SigninPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool isFormValid = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -38,6 +42,33 @@ class _SigninPageState extends State<SigninPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _signIn(BuildContext context) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await authProvider.signInWithEmailAndPassword(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -77,9 +108,13 @@ class _SigninPageState extends State<SigninPage> {
                   ],
                 ),
                 const SizedBox(height: 40),
-                AuthButton(text: 'Continue With Google', iconPath: 'images/Google.svg', onPressed: () => {}),
+                AuthButton(
+                    text: 'Continue With Google',
+                    iconPath: 'images/Google.svg',
+                    onPressed: () async{
+                      await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle(context);
+                    }),
                 const SizedBox(height: 60),
-
               ],
             ),
           ),
@@ -96,9 +131,18 @@ class _SigninPageState extends State<SigninPage> {
                       child: ElevatedButton(
                         style: buttonPrimary,
                         onPressed: isFormValid
-                            ? () {}
-                            : null,
-                        child: const Text('Sign In'),
+                            ? () async {
+                          await _signIn(context);
+                        }: null,
+                        child: isLoading
+                            ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.0,
+                          ),
+                        ) : const Text('Sign In'),
                       ),
                     ),
                     const SizedBox(height: 10),
