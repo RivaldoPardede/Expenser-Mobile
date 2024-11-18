@@ -18,6 +18,10 @@ dependencies:
   firebase_core: ^3.7.0
   firebase_auth: ^5.3.2
   provider: ^6.1.2
+  cloud_firestore: ^5.5.0
+  intl: ^0.19.0
+  currency_textfield: ^4.14.1
+  google_sign_in: ^6.2.2
 
 dev_dependencies:
   flutter_test:

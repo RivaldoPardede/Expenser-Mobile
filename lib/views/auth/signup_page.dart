@@ -88,7 +88,12 @@ class _SignupPageState extends State<SignupPage> {
                   ],
                 ),
                 const SizedBox(height: 40),
-                AuthButton(text: 'Continue With Google', iconPath: 'images/Google.svg', onPressed: () => {}),
+                AuthButton(
+                  text: 'Continue With Google',
+                  iconPath: 'images/Google.svg',
+                  onPressed: () async{
+                    await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle(context);
+                  }),
                 const SizedBox(height: 60),
 
               ],

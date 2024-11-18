@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/styles/button.dart';
 import 'package:final_project/views/onBoarding/onboarding_screen.dart';
-import 'package:final_project/views/auth/signup_page.dart';
 import 'package:final_project/views/common/custom_header.dart';
 import 'package:currency_picker/currency_picker.dart';
+import 'package:final_project/views/setup/setup_cash_balance.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:final_project/services/firestore_service.dart';
 
 class CountrySelectionPage extends StatefulWidget {
   const CountrySelectionPage({super.key});
@@ -14,6 +17,7 @@ class CountrySelectionPage extends StatefulWidget {
 
 class _CountrySelectionPageState extends State<CountrySelectionPage> {
   Currency? selectedCurrency;
+  final FirestoreService _firestoreService = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
@@ -90,19 +94,34 @@ class _CountrySelectionPageState extends State<CountrySelectionPage> {
               ],
             ),
           ),
-          // Positioned Continue Button at the bottom
           Positioned(
             bottom: 20,
             left: 16,
             right: 16,
             child: ElevatedButton(
-                style: buttonPrimary,
-                onPressed: selectedCurrency != null
-                ? () {
+              style: buttonPrimary,
+              onPressed: selectedCurrency != null
+                  ? () async {
+                final userId = FirebaseAuth.instance.currentUser?.uid;
+                if (userId != null && selectedCurrency != null) {
+                  try {
+                    await _firestoreService.saveCurrencyCode(userId, selectedCurrency!.code);
 
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SetupCashBalance()),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Failed to save currency: ${e.toString()}"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
-                : null,
-                child: const Text('Continue')
+              } : null,
+              child: const Text('Continue')
             )
           ),
         ],
