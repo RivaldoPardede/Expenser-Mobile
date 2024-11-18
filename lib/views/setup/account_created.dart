@@ -1,6 +1,6 @@
 import 'package:final_project/styles/button.dart';
-import 'package:final_project/views/auth/signin_page.dart';
 import 'package:final_project/views/common/custom_image_header.dart';
+import 'package:final_project/views/home/home_page.dart';
 import 'package:final_project/views/setup/turn_on_notification.dart';
 import 'package:flutter/material.dart';
 
@@ -55,7 +55,7 @@ class AccountCreated extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const SigninPage()),
+                            MaterialPageRoute(builder: (context) => const HomePage()),
                           );
                         },
                         child: const Text('Continue'),
