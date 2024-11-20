@@ -33,19 +33,6 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "156154230572-ba8n6hophuvjjcmdh4t0ne02vjto3akj.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "156154230572-ndhpnbp572uu3eeh81d5p9rasab73mb7.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "org.expenser.dev.finalProject"
-              }
-            }
-          ]
         }
       }
     }
