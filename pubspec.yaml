@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  fl_chart: ^0.64.0
   device_preview: 1.2.0
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.14
