@@ -18,6 +18,7 @@ class ModalInputAmount extends StatelessWidget {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          SizedBox(width: 15,),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
             decoration: BoxDecoration(
@@ -72,6 +73,7 @@ class ModalInputAmount extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(width: 10,),
         ],
     );
   }

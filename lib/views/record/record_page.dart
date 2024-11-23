@@ -2,7 +2,9 @@ import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/common/modal_input_amount.dart';
 import 'package:final_project/views/common/modal_toggle_selector.dart';
+import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class RecordPage extends StatefulWidget {
   const RecordPage({super.key});
@@ -18,11 +20,8 @@ class _RecordPageState extends State<RecordPage> {
   final TextEditingController noteController = TextEditingController();
 
   String transactionType = "Expense";
-  String account = "Cash";
+  String account = "Cash"; // TODO:ganti jd firestore
   String? userCurrencyCode;
-  late String category; // TODO: hapus
-  final List<String> accounts = ["Cash", "Bank"]; //Todo: hapus
-  final List<String> categories = ["Food", "Transport", "Utilities"]; //TODO: Hapus
 
   void fetchCurrencyCode() async {
     try {
@@ -41,7 +40,14 @@ class _RecordPageState extends State<RecordPage> {
 
   void _saveRecord() {
     int? amount = int.tryParse(amountController.text.replaceAll('-', '').replaceAll('+', ''));
-    print(amount);
+    print(amount); // TODO: logic firestore
+  }
+
+  String getFormattedTime() {
+    DateTime now = DateTime.now(); // Mendapatkan waktu saat ini
+    String formattedTime = DateFormat('HH.mm').format(now); // Format waktu
+    formattedTime = "Today " + formattedTime;
+    return formattedTime;
   }
 
   @override
@@ -63,17 +69,6 @@ class _RecordPageState extends State<RecordPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Center(
-            //   child: Container(
-            //     width: 40,
-            //     height: 5,
-            //     decoration: BoxDecoration(
-            //       color: Colors.grey,
-            //       borderRadius: BorderRadius.circular(8),
-            //     ),
-            //   ),
-            // ),
-            // const SizedBox(height: 16),
             ModalHeader(
               title: "Add Record",
               onCancel: () {
@@ -81,9 +76,10 @@ class _RecordPageState extends State<RecordPage> {
               },
               onAdd: () {
                 _saveRecord();
+                Navigator.pop(context);
               },
             ),
-            SizedBox(height: 69,),
+            const SizedBox(height: 69,),
             ModalToggleSelector(
               selectedOption: transactionType,
               options: ["Expense", "Income"],
@@ -98,11 +94,186 @@ class _RecordPageState extends State<RecordPage> {
                 });
               },
             ),
-            SizedBox(height: 35,),
+            const SizedBox(height: 35,),
             ModalInputAmount(
               currencyCode: userCurrencyCode,
               transactionType: transactionType,
               amountController: amountController,
+            ),
+            const SizedBox(height: 20,),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Text(
+                'GENERAL',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+            SizedBox(height: 15),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(9)
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 14,),
+                  CustomListTile(  // Menggunakan CustomListTile
+                    icon: Icons.account_balance_wallet,
+                    title: 'Account',
+                    value: account,
+                    onTap: () {
+
+                    },
+                    trailingIcon: Icons.chevron_right,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(14.0),
+                    child: Divider(
+                      height: 3,
+                      color: Color(0xffF5F5F5),
+                    ),
+                  ),
+                  CustomListTile(  // Menggunakan CustomListTile
+                    icon: Icons.category,
+                    title: 'Category',
+                    value: 'Required',
+                    onTap: () {
+
+                    },
+                    trailingIcon: Icons.chevron_right,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(14.0),
+                    child: Divider(
+                      height: 3,
+                      color: Color(0xffF5F5F5),
+                    ),
+                  ),
+                  CustomListTile(  // Menggunakan CustomListTile
+                    icon: Icons.calendar_month,
+                    title: 'Date',
+                    value: getFormattedTime(),
+                    onTap: () {},
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(14.0),
+                    child: Divider(
+                      height: 3,
+                      color: Color(0xffF5F5F5),
+                    ),
+                  ),
+                  CustomListTile(  // Menggunakan CustomListTile
+                    icon: Icons.label,
+                    title: 'Labels',
+                    value: '',
+                    onTap: () {
+                      // Open Labels Modal
+                    },
+                    trailingIcon: Icons.add,
+                  ),
+                  const SizedBox(height: 14,),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20,),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Text(
+                'MORE DETAIL',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+            SizedBox(height: 15),
+            Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(9)
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 14,),
+                  CustomListTile(  // Menggunakan CustomListTile
+                    icon: Icons.payment,
+                    title: 'Payment Type',
+                    value: account,
+                    onTap: () {
+
+                    },
+                    trailingIcon: Icons.chevron_right,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(14.0),
+                    child: Divider(
+                      height: 3,
+                      color: Color(0xffF5F5F5),
+                    ),
+                  ),
+                  CustomListTile(  // Menggunakan CustomListTile
+                    icon: Icons.person,
+                    title: 'Payee',
+                    value: '',
+                    onTap: () {
+
+                    },
+                    trailingIcon: Icons.chevron_right,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(14.0),
+                    child: Divider(
+                      height: 3,
+                      color: Color(0xffF5F5F5),
+                    ),
+                  ),
+                  CustomListTile(  // Menggunakan CustomListTile
+                    icon: Icons.location_on,
+                    title: 'Add Location',
+                    value: "",
+                    onTap: () {
+
+                    },
+                    trailingIcon: Icons.chevron_right,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(14.0),
+                    child: Divider(
+                      height: 3,
+                      color: Color(0xffF5F5F5),
+                    ),
+                  ),
+                  CustomListTile(  // Menggunakan CustomListTile
+                    icon: Icons.photo_camera,
+                    title: 'Attach photo',
+                    value: '',
+                    onTap: () {
+                      // Open Labels Modal
+                    },
+                    trailingIcon: Icons.chevron_right,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(14.0),
+                    child: Divider(
+                      height: 3,
+                      color: Color(0xffF5F5F5),
+                    ),
+                  ),
+                  CustomListTile(  // Menggunakan CustomListTile
+                    icon: Icons.note_alt,
+                    title: 'Note',
+                    value: '',
+                    onTap: () {
+                      // Open Labels Modal
+                    },
+                    trailingIcon: Icons.chevron_right,
+                  ),
+                  const SizedBox(height: 14,),
+                ],
+              ),
             ),
           ],
         ),
