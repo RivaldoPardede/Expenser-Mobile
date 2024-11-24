@@ -1,5 +1,6 @@
 import 'package:final_project/views/add.dart';
 import 'package:final_project/views/home/home_page.dart';
+import 'package:final_project/views/record/record_page.dart';
 import 'package:final_project/views/settings/settings_page.dart';
 import 'package:final_project/views/statistic/statistic_page.dart';
 import 'package:final_project/views/transaction/transaction_page.dart';
@@ -56,7 +57,14 @@ class _MainScreenState extends State<MainScreen> {
           }).toList(),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => setState(() => selectedTab = 2),
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.95, // Maksimum 80% dari tinggi layar
+            ),
+            builder: (context) => RecordPage(),
+          ),
           backgroundColor: const Color(0xFF5B9EE1),
           elevation: 5,
           shape: const CircleBorder(),
