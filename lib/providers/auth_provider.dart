@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:final_project/views/auth/country_selection_page.dart';
-import 'package:final_project/views/home/home_page.dart';
+import 'package:final_project/views/navigation/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -39,7 +39,7 @@ class AuthProvider with ChangeNotifier {
         if (userExists) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
+            MaterialPageRoute(builder: (context) => const MainScreen()),
           );
         } else {
           Navigator.pushReplacement(
@@ -80,7 +80,7 @@ class AuthProvider with ChangeNotifier {
         if (userExists) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
+            MaterialPageRoute(builder: (context) => const MainScreen()),
           );
         } else {
           Navigator.pushReplacement(

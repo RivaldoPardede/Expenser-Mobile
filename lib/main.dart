@@ -1,5 +1,3 @@
-import 'package:final_project/views/home/home_page.dart';
-import 'package:final_project/views/navigation/main_screen.dart';
 import 'package:final_project/views/onBoarding/onboarding_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +29,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Inter',
       ),
-      home: const MainScreen(),
+      home: const OnboardingScreen(),
     );
   }
 }
