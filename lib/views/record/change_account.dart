@@ -1,3 +1,6 @@
+import 'package:final_project/services/firestore_service.dart';
+import 'package:final_project/styles/color.dart';
+import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/common/modal_header.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +12,27 @@ class ChangeAccount extends StatefulWidget {
 }
 
 class _ChangeAccountState extends State<ChangeAccount> {
+  final FirestoreService _firestoreService = FirestoreService();
+  List<String> accountIds = [];
+
+  @override
+  void initState(){
+    super.initState();
+    fetchAccountIds();
+  }
+
+  Future<void> fetchAccountIds() async {
+    try {
+      List<String> ids = await _firestoreService.getAccountIds();
+      setState(() {
+        accountIds = ids;
+      });
+      print("dijalankan");
+    } catch (e) {
+      print('Error fetching account IDs: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -34,7 +58,47 @@ class _ChangeAccountState extends State<ChangeAccount> {
               height: 3,
               color: Colors.grey[300],
             ),
-            SizedBox(height: 35,)
+            const SizedBox(height: 35,),
+            Container(
+              decoration: BoxDecoration(
+                  color: white,
+                  borderRadius: BorderRadius.circular(9)
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 14,),
+                  ...accountIds.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final id = entry.value;
+
+                    return Column(
+                      children: [
+                        CustomListTile(
+                          icon: Icon(
+                            Icons.account_balance_wallet,
+                            color: Colors.grey[600],
+                          ),
+                          title: id,
+                          value: "",
+                          onTap: () {
+                            Navigator.pop(context, id);
+                          },
+                        ),
+                        if (index != accountIds.length - 1)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 14.0),
+                            child: Divider(
+                              height: 3,
+                              color: Color(0xffF5F5F5),
+                            ),
+                          ),
+                      ],
+                    );
+                  }).toList(),
+                  const SizedBox(height: 14,),
+                ],
+              ),
+            ),
           ],
         ),
       ),

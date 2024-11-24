@@ -39,4 +39,30 @@ class FirestoreService {
     await accountRef.set(accountData);
   }
 
+  Future<List<String>> getAccountIds() async {
+    List<String> accountIds = [];
+
+    try {
+      final user = _auth.currentUser;
+      if(user != null) {
+        final docSnapshot = await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('accounts')
+            .get();
+
+        for(var doc in docSnapshot.docs) {
+          accountIds.add(doc.id);
+        }
+
+        return accountIds;
+      }
+    } catch (e) {
+      print('Error fetching account IDs: $e');
+      return [];
+    }
+
+    return accountIds;
+  }
+
 }

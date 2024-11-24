@@ -1,4 +1,5 @@
 import 'package:final_project/services/firestore_service.dart';
+import 'package:final_project/styles/color.dart';
 import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/common/modal_input_amount.dart';
 import 'package:final_project/views/common/modal_toggle_selector.dart';
@@ -118,7 +119,7 @@ class _RecordPageState extends State<RecordPage> {
             SizedBox(height: 15),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: white,
                 borderRadius: BorderRadius.circular(9)
               ),
               child: Column(
@@ -131,7 +132,8 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                     title: 'Account',
                     value: account,
-                    onTap: () => showModalBottomSheet(
+                    onTap: () async{
+                      final selectedAccount = await showModalBottomSheet<String>(
                         context: context,
                         isScrollControlled: true,
                         constraints: BoxConstraints(
@@ -139,7 +141,13 @@ class _RecordPageState extends State<RecordPage> {
                           minHeight: MediaQuery.of(context).size.height * 0.95,
                         ),
                         builder: (context) => const ChangeAccount(),
-                      ),
+                      );
+                      if (selectedAccount != null) {
+                        setState(() {
+                          account = selectedAccount;
+                        });
+                      }
+                    },
                     trailingIcon: Icons.chevron_right,
                   ),
                   const Padding(
