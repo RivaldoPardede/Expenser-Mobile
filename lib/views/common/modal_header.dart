@@ -3,48 +3,70 @@ import 'package:flutter/material.dart';
 
 class ModalHeader extends StatelessWidget {
   final String title;
+  final String cancelText;
+  final String? addText;
+  final bool isleadingIcon;
   final VoidCallback onCancel;
-  final VoidCallback onAdd;
+  final VoidCallback? onAdd;
 
   const ModalHeader({
     super.key,
     required this.title,
+    required this.cancelText,
+    this.addText,
+    required this.isleadingIcon,
     required this.onCancel,
-    required this.onAdd,
+    this.onAdd,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Stack(
+      alignment: Alignment.center,
       children: [
-        TextButton(
-          onPressed: onCancel,
-          child: Text(
-            "Cancel",
-            style: TextStyle(
-              color: blue,
-              fontSize: 16,
+        // Tombol Cancel di sisi kiri
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: onCancel,
+            icon: isleadingIcon ? Icon(Icons.arrow_back, color: blue,) : null,
+            label: Text(
+              cancelText,
+              style: TextStyle(
+                color: blue,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        TextButton(
-          onPressed: onAdd,
+        // Judul di tengah
+        Center(
           child: Text(
-            "Add",
-            style: TextStyle(
-              color: blue,
-              fontSize: 16,
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
+        // Tombol Add di sisi kanan
+        if (addText != null)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: onAdd,
+              child: Text(
+                addText!,
+                style: TextStyle(
+                  color: blue,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }

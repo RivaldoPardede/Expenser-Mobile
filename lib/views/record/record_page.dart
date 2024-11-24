@@ -3,6 +3,7 @@ import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/common/modal_input_amount.dart';
 import 'package:final_project/views/common/modal_toggle_selector.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
+import 'package:final_project/views/record/change_account.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -72,6 +73,9 @@ class _RecordPageState extends State<RecordPage> {
           children: [
             ModalHeader(
               title: "Add Record",
+              cancelText: "Cancel",
+              addText: "Add",
+              isleadingIcon: false,
               onCancel: () {
                 Navigator.pop(context);
               },
@@ -80,7 +84,7 @@ class _RecordPageState extends State<RecordPage> {
                 Navigator.pop(context);
               },
             ),
-            const SizedBox(height: 69,),
+            const SizedBox(height: 40,),
             ModalToggleSelector(
               selectedOption: transactionType,
               options: ["Expense", "Income"],
@@ -95,7 +99,6 @@ class _RecordPageState extends State<RecordPage> {
                 });
               },
             ),
-            const SizedBox(height: 35,),
             ModalInputAmount(
               currencyCode: userCurrencyCode,
               transactionType: transactionType,
@@ -121,16 +124,22 @@ class _RecordPageState extends State<RecordPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 14,),
-                  CustomListTile(  // Menggunakan CustomListTile
+                  CustomListTile(
                     icon: Icon(
                       Icons.account_balance_wallet,
                       color: Colors.grey[600],
                     ),
                     title: 'Account',
                     value: account,
-                    onTap: () {
-
-                    },
+                    onTap: () => showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.of(context).size.height * 0.95,
+                          minHeight: MediaQuery.of(context).size.height * 0.95,
+                        ),
+                        builder: (context) => const ChangeAccount(),
+                      ),
                     trailingIcon: Icons.chevron_right,
                   ),
                   const Padding(
@@ -140,7 +149,7 @@ class _RecordPageState extends State<RecordPage> {
                       color: Color(0xffF5F5F5),
                     ),
                   ),
-                  CustomListTile(  // Menggunakan CustomListTile
+                  CustomListTile(
                     icon: Icon(
                       Icons.category,
                       color: Colors.grey[600],
@@ -159,7 +168,7 @@ class _RecordPageState extends State<RecordPage> {
                       color: Color(0xffF5F5F5),
                     ),
                   ),
-                  CustomListTile(  // Menggunakan CustomListTile
+                  CustomListTile(
                     icon: Icon(
                       Icons.calendar_month,
                       color: Colors.grey[600],
@@ -175,7 +184,7 @@ class _RecordPageState extends State<RecordPage> {
                       color: Color(0xffF5F5F5),
                     ),
                   ),
-                  CustomListTile(  // Menggunakan CustomListTile
+                  CustomListTile(
                     icon: SvgPicture.asset(
                       "images/modal/labels.svg",
                       width: 20,
@@ -213,7 +222,7 @@ class _RecordPageState extends State<RecordPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 14,),
-                  CustomListTile(  // Menggunakan CustomListTile
+                  CustomListTile(
                     icon: SvgPicture.asset(
                       "images/modal/payment_type.svg",
                       width: 20,
@@ -234,7 +243,7 @@ class _RecordPageState extends State<RecordPage> {
                       color: Color(0xffF5F5F5),
                     ),
                   ),
-                  CustomListTile(  // Menggunakan CustomListTile
+                  CustomListTile(
                     icon: Icon(
                       Icons.person,
                       color: Colors.grey[600],
@@ -253,7 +262,7 @@ class _RecordPageState extends State<RecordPage> {
                       color: Color(0xffF5F5F5),
                     ),
                   ),
-                  CustomListTile(  // Menggunakan CustomListTile
+                  CustomListTile(
                     icon: Icon(
                       Icons.location_on,
                       color: Colors.grey[600],
@@ -272,7 +281,7 @@ class _RecordPageState extends State<RecordPage> {
                       color: Color(0xffF5F5F5),
                     ),
                   ),
-                  CustomListTile(  // Menggunakan CustomListTile
+                  CustomListTile(
                     icon: Icon(
                       Icons.photo_camera,
                       color: Colors.grey[600],
@@ -291,7 +300,7 @@ class _RecordPageState extends State<RecordPage> {
                       color: Color(0xffF5F5F5),
                     ),
                   ),
-                  CustomListTile(  // Menggunakan CustomListTile
+                  CustomListTile(
                     icon: SvgPicture.asset(
                       "images/modal/note.svg",
                       width: 20,

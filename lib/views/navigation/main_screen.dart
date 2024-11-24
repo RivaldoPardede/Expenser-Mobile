@@ -60,9 +60,9 @@ class _MainScreenState extends State<MainScreen> {
             context: context,
             isScrollControlled: true,
             constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.95, // Maksimum 80% dari tinggi layar
+              maxHeight: MediaQuery.of(context).size.height * 0.95,
             ),
-            builder: (context) => RecordPage(),
+            builder: (context) => const RecordPage(),
           ),
           backgroundColor: const Color(0xFF5B9EE1),
           elevation: 5,
