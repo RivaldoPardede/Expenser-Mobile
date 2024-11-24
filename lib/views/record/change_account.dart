@@ -1,6 +1,7 @@
 import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/styles/color.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
+import 'package:final_project/views/common/custom_list_tile_divider.dart';
 import 'package:final_project/views/common/modal_header.dart';
 import 'package:flutter/material.dart';
 
@@ -80,18 +81,13 @@ class _ChangeAccountState extends State<ChangeAccount> {
                           ),
                           title: id,
                           value: "",
+                          needCircleAvatar: true,
                           onTap: () {
                             Navigator.pop(context, id);
                           },
                         ),
                         if (index != accountIds.length - 1)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 14.0),
-                            child: Divider(
-                              height: 3,
-                              color: Color(0xffF5F5F5),
-                            ),
-                          ),
+                          const CustomListTileDivider(),
                       ],
                     );
                   }).toList(),

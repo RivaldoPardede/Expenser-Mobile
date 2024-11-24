@@ -37,6 +37,7 @@ flutter:
   assets:
     - images/
     - images/home/
+    - images/categories/
     - images/modal/
 
   fonts:

@@ -5,6 +5,7 @@ class CustomListTile extends StatefulWidget {
   final Widget icon;
   final String title;
   final String value;
+  final bool needCircleAvatar;
   final VoidCallback onTap;
   final IconData? trailingIcon;
 
@@ -13,6 +14,7 @@ class CustomListTile extends StatefulWidget {
     required this.icon,
     required this.title,
     required this.value,
+    required this.needCircleAvatar,
     required this.onTap,
     this.trailingIcon,
   }) : super(key: key);
@@ -54,11 +56,13 @@ class _CustomListTileState extends State<CustomListTile> {
             // Leading Icon and Title
             Row(
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: isTapped ? Colors.grey[100] : Colors.grey[300],
-                  child: widget.icon
-                ),
+                widget.needCircleAvatar ?
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: isTapped ? Colors.grey[100] : Colors.grey[300],
+                    child: widget.icon
+                  )
+                : widget.icon,
                 const SizedBox(width: 16),
                 Text(
                   widget.title,

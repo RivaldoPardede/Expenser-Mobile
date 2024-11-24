@@ -1,10 +1,14 @@
+import 'package:final_project/models/categories_model.dart';
 import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/styles/color.dart';
+import 'package:final_project/views/common/custom_list_tile_divider.dart';
 import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/common/modal_input_amount.dart';
+import 'package:final_project/views/common/modal_subheader.dart';
 import 'package:final_project/views/common/modal_toggle_selector.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/record/change_account.dart';
+import 'package:final_project/views/record/change_category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -23,7 +27,8 @@ class _RecordPageState extends State<RecordPage> {
   final TextEditingController noteController = TextEditingController();
 
   String transactionType = "Expense";
-  String account = "Cash"; // TODO:ganti jd firestore
+  String account = "Cash";
+  String category = "";
   String? userCurrencyCode;
 
   void fetchCurrencyCode() async {
@@ -43,7 +48,14 @@ class _RecordPageState extends State<RecordPage> {
 
   void _saveRecord() {
     int? amount = int.tryParse(amountController.text.replaceAll('-', '').replaceAll('+', ''));
-    print(amount); // TODO: logic firestore
+    final accountData = {
+      "amount" : amount,
+      "transactionType" : transactionType,
+      "account" : account,
+      "category" : category,
+      "date" : getFormattedTime(),
+    };
+    print(accountData); // TODO: logic firestore
   }
 
   String getFormattedTime() {
@@ -51,6 +63,18 @@ class _RecordPageState extends State<RecordPage> {
     String formattedTime = DateFormat('HH.mm').format(now); // Format waktu
     formattedTime = "Today " + formattedTime;
     return formattedTime;
+  }
+
+  Future<String?> _showBottomModal(BuildContext context, Widget destination) {
+    return showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.95,
+        minHeight: MediaQuery.of(context).size.height * 0.95,
+      ),
+      builder: (context) => destination,
+    );
   }
 
   @override
@@ -106,17 +130,8 @@ class _RecordPageState extends State<RecordPage> {
               amountController: amountController,
             ),
             const SizedBox(height: 20,),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0),
-              child: Text(
-                'GENERAL',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ),
-            SizedBox(height: 15),
+            const ModalSubheader(text: 'GENERAL'),
+            const SizedBox(height: 15),
             Container(
               decoration: BoxDecoration(
                 color: white,
@@ -132,16 +147,9 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                     title: 'Account',
                     value: account,
+                    needCircleAvatar: true,
                     onTap: () async{
-                      final selectedAccount = await showModalBottomSheet<String>(
-                        context: context,
-                        isScrollControlled: true,
-                        constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height * 0.95,
-                          minHeight: MediaQuery.of(context).size.height * 0.95,
-                        ),
-                        builder: (context) => const ChangeAccount(),
-                      );
+                      final selectedAccount = await _showBottomModal(context, ChangeAccount());
                       if (selectedAccount != null) {
                         setState(() {
                           account = selectedAccount;
@@ -150,32 +158,33 @@ class _RecordPageState extends State<RecordPage> {
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(14.0),
-                    child: Divider(
-                      height: 3,
-                      color: Color(0xffF5F5F5),
-                    ),
-                  ),
+                  CustomListTileDivider(),
                   CustomListTile(
-                    icon: Icon(
-                      Icons.category,
-                      color: Colors.grey[600],
-                    ),
+                    icon: category.isEmpty
+                            ? Icon(
+                                Icons.category,
+                                color: Colors.grey[600],
+                              )
+                            : SvgPicture.asset(
+                                categoriesData[category]!,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.contain,
+                              ),
                     title: 'Category',
-                    value: 'Required',
-                    onTap: () {
-
+                    value: category.isEmpty ? 'Required' : category,
+                    needCircleAvatar: category.isEmpty ? true : false,
+                    onTap: () async {
+                      final selectedCategory = await _showBottomModal(context, ChangeCategory());
+                      if (selectedCategory != null) {
+                        setState(() {
+                          category = selectedCategory;
+                        });
+                      }
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(14.0),
-                    child: Divider(
-                      height: 3,
-                      color: Color(0xffF5F5F5),
-                    ),
-                  ),
+                  CustomListTileDivider(),
                   CustomListTile(
                     icon: Icon(
                       Icons.calendar_month,
@@ -183,15 +192,10 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                     title: 'Date',
                     value: getFormattedTime(),
+                    needCircleAvatar: true,
                     onTap: () {},
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(14.0),
-                    child: Divider(
-                      height: 3,
-                      color: Color(0xffF5F5F5),
-                    ),
-                  ),
+                  CustomListTileDivider(),
                   CustomListTile(
                     icon: SvgPicture.asset(
                       "images/modal/labels.svg",
@@ -201,9 +205,16 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                     title: 'Labels',
                     value: '',
-                    onTap: () {
-                      // Open Labels Modal
-                    },
+                    needCircleAvatar: true,
+                    onTap: () => showModalBottomSheet<String>(
+                      context: context,
+                      isScrollControlled: true,
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.95,
+                        minHeight: MediaQuery.of(context).size.height * 0.95,
+                      ),
+                      builder: (context) => const ChangeCategory(),
+                    ),
                     trailingIcon: Icons.add,
                   ),
                   const SizedBox(height: 14,),
@@ -211,17 +222,8 @@ class _RecordPageState extends State<RecordPage> {
               ),
             ),
             const SizedBox(height: 20,),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0),
-              child: Text(
-                'MORE DETAIL',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ),
-            SizedBox(height: 15),
+            const ModalSubheader(text: "MORE DETAIL"),
+            const SizedBox(height: 15),
             Container(
               decoration: BoxDecoration(
                   color: Colors.white,
@@ -239,18 +241,13 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                     title: 'Payment Type',
                     value: account,
+                    needCircleAvatar: true,
                     onTap: () {
 
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(14.0),
-                    child: Divider(
-                      height: 3,
-                      color: Color(0xffF5F5F5),
-                    ),
-                  ),
+                  CustomListTileDivider(),
                   CustomListTile(
                     icon: Icon(
                       Icons.person,
@@ -258,18 +255,13 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                     title: 'Payee',
                     value: '',
+                    needCircleAvatar: true,
                     onTap: () {
 
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(14.0),
-                    child: Divider(
-                      height: 3,
-                      color: Color(0xffF5F5F5),
-                    ),
-                  ),
+                  CustomListTileDivider(),
                   CustomListTile(
                     icon: Icon(
                       Icons.location_on,
@@ -277,18 +269,13 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                     title: 'Add Location',
                     value: "",
+                    needCircleAvatar: true,
                     onTap: () {
 
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(14.0),
-                    child: Divider(
-                      height: 3,
-                      color: Color(0xffF5F5F5),
-                    ),
-                  ),
+                  CustomListTileDivider(),
                   CustomListTile(
                     icon: Icon(
                       Icons.photo_camera,
@@ -296,18 +283,13 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                     title: 'Attach photo',
                     value: '',
+                    needCircleAvatar: true,
                     onTap: () {
                       // Open Labels Modal
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(14.0),
-                    child: Divider(
-                      height: 3,
-                      color: Color(0xffF5F5F5),
-                    ),
-                  ),
+                  CustomListTileDivider(),
                   CustomListTile(
                     icon: SvgPicture.asset(
                       "images/modal/note.svg",
@@ -317,6 +299,7 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                     title: 'Note',
                     value: '',
+                    needCircleAvatar: true,
                     onTap: () {
                       // Open Labels Modal
                     },
