@@ -90,71 +90,69 @@ class _SigninPageState extends State<SigninPage> {
               ],
             ),
           ),
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 50.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: buttonPrimary,
-                        onPressed: isFormValid
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 50.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: buttonPrimary,
+                      onPressed: isFormValid
                           ? () async {
-                          await Provider.of<AuthProvider>(context, listen: false).signInWithEmailAndPassword(
-                            context,
-                            _emailController.text.trim(),
-                            _passwordController.text.trim(),
-                          );
-                        }: null,
-                        child: isLoading
-                            ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.0,
-                          ),
-                        ) : const Text('Sign In'),
-                      ),
+                        await Provider.of<AuthProvider>(context, listen: false).signInWithEmailAndPassword(
+                          context,
+                          _emailController.text.trim(),
+                          _passwordController.text.trim(),
+                        );
+                      }: null,
+                      child: isLoading
+                          ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.0,
+                        ),
+                      ) : const Text('Sign In'),
                     ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Don’t Have An Account Yet? ',
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Don’t Have An Account Yet? ',
+                        style: TextStyle(
+                          color: Color(0xFF2E2E2E),
+                          fontSize: 16,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SignupPage()),
+                          );
+                        },
+                        child: const Text(
+                          'Sign Up',
                           style: TextStyle(
                             color: Color(0xFF2E2E2E),
                             fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => const SignupPage()),
-                            );
-                          },
-                          child: const Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              color: Color(0xFF2E2E2E),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ),
+            ),
         ],
       ),
     );

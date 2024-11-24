@@ -91,92 +91,91 @@ class _SignupPageState extends State<SignupPage> {
                 AuthButton(
                   text: 'Continue With Google',
                   iconPath: 'images/Google.svg',
-                  onPressed: () async{
+                  onPressed: () async {
                     await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle(context);
-                  }),
+                  },
+                ),
                 const SizedBox(height: 60),
-
               ],
             ),
           ),
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 50.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: buttonPrimary,
-                        onPressed: isFormValid
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 50.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: buttonPrimary,
+                      onPressed: isFormValid
                           ? () async {
-                          try {
-                            await authProvider.signUp(_emailController.text, _passwordController.text);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Verification email sent! Please check your inbox."),
-                                duration: Duration(seconds: 4),
-                              ),
+                        try {
+                          await authProvider.signUp(_emailController.text, _passwordController.text);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Verification email sent! Please check your inbox."),
+                              duration: Duration(seconds: 4),
+                            ),
+                          );
+                          authProvider.startEmailVerificationCheck(() {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
                             );
-                            authProvider.startEmailVerificationCheck(() {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
-                              );
-                            });
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Failed to sign up: ${e.toString()}"),
-                                backgroundColor: Colors.red,
-                                duration: const Duration(seconds: 4),
-                              ),
-                            );
-                          }
+                          });
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Failed to sign up: ${e.toString()}"),
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 4),
+                            ),
+                          );
                         }
-                        : null,
-                        child: const Text('Sign Up'),
-                      ),
+                      }
+                          : null,
+                      child: const Text('Sign Up'),
                     ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Already have an account? ',
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Already have an account? ',
+                        style: TextStyle(
+                          color: Color(0xFF2E2E2E),
+                          fontSize: 16,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SigninPage()),
+                          );
+                        },
+                        child: const Text(
+                          'Sign In',
                           style: TextStyle(
                             color: Color(0xFF2E2E2E),
                             fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => const SigninPage()),
-                            );
-                          },
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              color: Color(0xFF2E2E2E),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
         ],
       ),
+
     );
   }
 
