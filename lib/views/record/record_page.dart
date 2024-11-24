@@ -4,6 +4,7 @@ import 'package:final_project/views/common/modal_input_amount.dart';
 import 'package:final_project/views/common/modal_toggle_selector.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 class RecordPage extends StatefulWidget {
@@ -121,7 +122,10 @@ class _RecordPageState extends State<RecordPage> {
                 children: [
                   const SizedBox(height: 14,),
                   CustomListTile(  // Menggunakan CustomListTile
-                    icon: Icons.account_balance_wallet,
+                    icon: Icon(
+                      Icons.account_balance_wallet,
+                      color: Colors.grey[600],
+                    ),
                     title: 'Account',
                     value: account,
                     onTap: () {
@@ -137,7 +141,10 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                   ),
                   CustomListTile(  // Menggunakan CustomListTile
-                    icon: Icons.category,
+                    icon: Icon(
+                      Icons.category,
+                      color: Colors.grey[600],
+                    ),
                     title: 'Category',
                     value: 'Required',
                     onTap: () {
@@ -153,7 +160,10 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                   ),
                   CustomListTile(  // Menggunakan CustomListTile
-                    icon: Icons.calendar_month,
+                    icon: Icon(
+                      Icons.calendar_month,
+                      color: Colors.grey[600],
+                    ),
                     title: 'Date',
                     value: getFormattedTime(),
                     onTap: () {},
@@ -166,7 +176,12 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                   ),
                   CustomListTile(  // Menggunakan CustomListTile
-                    icon: Icons.label,
+                    icon: SvgPicture.asset(
+                      "images/modal/labels.svg",
+                      width: 20,
+                      height: 20,
+                      fit: BoxFit.contain,
+                    ),
                     title: 'Labels',
                     value: '',
                     onTap: () {
@@ -199,7 +214,12 @@ class _RecordPageState extends State<RecordPage> {
                 children: [
                   const SizedBox(height: 14,),
                   CustomListTile(  // Menggunakan CustomListTile
-                    icon: Icons.payment,
+                    icon: SvgPicture.asset(
+                      "images/modal/payment_type.svg",
+                      width: 20,
+                      height: 20,
+                      fit: BoxFit.contain,
+                    ),
                     title: 'Payment Type',
                     value: account,
                     onTap: () {
@@ -215,7 +235,10 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                   ),
                   CustomListTile(  // Menggunakan CustomListTile
-                    icon: Icons.person,
+                    icon: Icon(
+                      Icons.person,
+                      color: Colors.grey[600],
+                    ),
                     title: 'Payee',
                     value: '',
                     onTap: () {
@@ -231,7 +254,10 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                   ),
                   CustomListTile(  // Menggunakan CustomListTile
-                    icon: Icons.location_on,
+                    icon: Icon(
+                      Icons.location_on,
+                      color: Colors.grey[600],
+                    ),
                     title: 'Add Location',
                     value: "",
                     onTap: () {
@@ -247,7 +273,10 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                   ),
                   CustomListTile(  // Menggunakan CustomListTile
-                    icon: Icons.photo_camera,
+                    icon: Icon(
+                      Icons.photo_camera,
+                      color: Colors.grey[600],
+                    ),
                     title: 'Attach photo',
                     value: '',
                     onTap: () {
@@ -263,7 +292,12 @@ class _RecordPageState extends State<RecordPage> {
                     ),
                   ),
                   CustomListTile(  // Menggunakan CustomListTile
-                    icon: Icons.note_alt,
+                    icon: SvgPicture.asset(
+                      "images/modal/note.svg",
+                      width: 20,
+                      height: 20,
+                      fit: BoxFit.contain,
+                    ),
                     title: 'Note',
                     value: '',
                     onTap: () {

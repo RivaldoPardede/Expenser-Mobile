@@ -2,7 +2,7 @@ import 'package:final_project/styles/color.dart';
 import 'package:flutter/material.dart';
 
 class CustomListTile extends StatefulWidget {
-  final IconData icon;
+  final Widget icon;
   final String title;
   final String value;
   final VoidCallback onTap;
@@ -56,18 +56,15 @@ class _CustomListTileState extends State<CustomListTile> {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundColor: Colors.grey[300],
-                  child: Icon(
-                    widget.icon,
-                    color: isTapped ? Colors.grey[800] : Colors.grey[600],
-                  ),
+                  backgroundColor: isTapped ? Colors.grey[100] : Colors.grey[300],
+                  child: widget.icon
                 ),
                 const SizedBox(width: 16),
                 Text(
                   widget.title,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: isTapped ? FontWeight.w900 : FontWeight.w500,
+                    fontWeight: isTapped ? FontWeight.w700 : FontWeight.w500,
                     color: blackPrimary,
                   ),
                 ),
@@ -83,7 +80,7 @@ class _CustomListTileState extends State<CustomListTile> {
                     color: widget.value == "Required"
                         ? Colors.red
                         : isTapped ? blackPrimary : Colors.grey[800],
-                    fontWeight: isTapped ? FontWeight.w900 : FontWeight.normal
+                    fontWeight: isTapped ? FontWeight.w700 : FontWeight.normal
                   ),
                 ),
                 const SizedBox(width: 8),
