@@ -75,7 +75,7 @@ class _RecordPageState extends State<RecordPage> {
     }
   }
 
-  void _saveRecord() {
+  void _saveRecord(BuildContext modalContext) {
     int? amount = int.tryParse(amountController.text.replaceAll('-', '').replaceAll('+', ''));
     final accountData = {
       "transactionType" : transactionType,
@@ -89,6 +89,31 @@ class _RecordPageState extends State<RecordPage> {
       "note" : note,
     };
     print(accountData); // TODO: logic firestore
+
+    if (accountData["amount"] == null) {
+      ScaffoldMessenger.of(modalContext).showSnackBar(
+        const SnackBar(content: Text("Record Amount must not be 0")),
+      );
+    } else if (accountData["category"] == null || accountData["category"] == "") {
+      ScaffoldMessenger.of(modalContext).showSnackBar(
+        const SnackBar(content: Text("Record Category must not be empty")),
+      );
+    } else if(accountData["paymentType"] == "") {
+      ScaffoldMessenger.of(modalContext).showSnackBar(
+        const SnackBar(content: Text("Record Payment Type must not be empty")),
+      );
+    } else if(accountData["Account"] == "") {
+      ScaffoldMessenger.of(modalContext).showSnackBar(
+        const SnackBar(content: Text("Record Account must not be empty")),
+      );
+    } else{
+      // TODO: logic firestore
+      Navigator.pop(modalContext);
+
+      ScaffoldMessenger.of(modalContext).showSnackBar(
+        const SnackBar(content: Text("Record saved successfully"), behavior: SnackBarBehavior.floating,),
+      );
+    }
   }
 
   String getFormattedTime() {
@@ -118,235 +143,239 @@ class _RecordPageState extends State<RecordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ModalHeader(
-              title: "Add Record",
-              cancelText: "Cancel",
-              addText: "Add",
-              isleadingIcon: false,
-              onCancel: () {
-                Navigator.pop(context);
-              },
-              onAdd: () {
-                _saveRecord();
-                Navigator.pop(context);
-              },
-            ),
-            const SizedBox(height: 40,),
-            ModalToggleSelector(
-              selectedOption: transactionType,
-              options: ["Expense", "Income"],
-              onOptionSelected: (value) {
-                setState(() {
-                  transactionType = value;
-                  if (transactionType == "Expense") {
-                    amountController.text = amountController.text.replaceAll("+", "-");
-                  } else{
-                    amountController.text = amountController.text.replaceAll("-", "+");
-                  }
-                });
-              },
-            ),
-            isLoading
-              ? Row(
-                children: [
-                  SizedBox(height: 100, width: 18,),
-                  Container(
-                    height: 35,
-                    padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: blackPrimary,
-                      borderRadius: BorderRadius.circular(56),
-                    ),
-                    child: SizedBox(
-                      width: 28,
-                      height: 30,
-                      child: CircularProgressIndicator(color: blue,),
-                    ),
-                  ),
-                ],
-              )
-              : ModalInputAmount(
-                  currencyCode: userCurrencyCode,
-                  transactionType: transactionType,
-                  amountController: amountController,
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(29)),
+      child: Scaffold(
+        body: Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ModalHeader(
+                  title: "Add Record",
+                  cancelText: "Cancel",
+                  addText: "Add",
+                  isleadingIcon: false,
+                  onCancel: () {
+                    Navigator.pop(context);
+                  },
+                  onAdd: () {
+                    _saveRecord(context);
+                  },
                 ),
-            const SizedBox(height: 20,),
-            const ModalSubheader(text: 'GENERAL'),
-            const SizedBox(height: 15),
-            Container(
-              decoration: BoxDecoration(
-                color: white,
-                borderRadius: BorderRadius.circular(9)
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 14,),
-                  CustomListTile(
-                    icon: Icon(
-                      Icons.account_balance_wallet,
-                      color: Colors.grey[600],
-                    ),
-                    title: 'Account',
-                    value: account,
-                    needCircleAvatar: true,
-                    onTap: () async{
-                      final selectedAccount = await _showBottomModal(context, const ChangeAccount());
-                      if (selectedAccount != null) {
-                        setState(() {
-                          account = selectedAccount;
-                          fetchCurrencyCode(account);
-                        });
+                const SizedBox(height: 40,),
+                ModalToggleSelector(
+                  selectedOption: transactionType,
+                  options: ["Expense", "Income"],
+                  onOptionSelected: (value) {
+                    setState(() {
+                      transactionType = value;
+                      if (transactionType == "Expense") {
+                        amountController.text = amountController.text.replaceAll("+", "-");
+                      } else{
+                        amountController.text = amountController.text.replaceAll("-", "+");
                       }
-                    },
-                    trailingIcon: Icons.chevron_right,
-                  ),
-                  const CustomListTileDivider(),
-                  CustomListTile(
-                    icon: category.isEmpty
-                        ? Icon(
-                            Icons.category,
-                            color: Colors.grey[600],
-                        )
-                        : SvgPicture.asset(
-                            categoriesData[category]!,
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.contain,
+                    });
+                  },
+                ),
+                isLoading
+                  ? Row(
+                    children: [
+                      SizedBox(height: 100, width: 18,),
+                      Container(
+                        height: 35,
+                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: blackPrimary,
+                          borderRadius: BorderRadius.circular(56),
                         ),
-                    title: 'Category',
-                    value: category.isEmpty ? 'Required' : category,
-                    needCircleAvatar: category.isEmpty ? true : false,
-                    onTap: () async {
-                      final selectedCategory = await _showBottomModal(context, const ChangeCategory());
-                      if (selectedCategory != null) {
-                        setState(() {
-                          category = selectedCategory;
-                        });
-                      }
-                    },
-                    trailingIcon: Icons.chevron_right,
-                  ),
-                  const CustomListTileDivider(),
-                  CustomListTile(
-                    icon: Icon(
-                      Icons.calendar_month,
-                      color: Colors.grey[600],
+                        child: SizedBox(
+                          width: 28,
+                          height: 30,
+                          child: CircularProgressIndicator(color: blue,),
+                        ),
+                      ),
+                    ],
+                  )
+                  : ModalInputAmount(
+                      currencyCode: userCurrencyCode,
+                      transactionType: transactionType,
+                      amountController: amountController,
                     ),
-                    title: 'Date',
-                    value: getFormattedTime(),
-                    needCircleAvatar: true,
-                    onTap: () {},
+                const SizedBox(height: 20,),
+                const ModalSubheader(text: 'GENERAL'),
+                const SizedBox(height: 15),
+                Container(
+                  decoration: BoxDecoration(
+                    color: white,
+                    borderRadius: BorderRadius.circular(9)
                   ),
-                  const SizedBox(height: 14,),
-                ],
-              ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 14,),
+                      CustomListTile(
+                        icon: Icon(
+                          Icons.account_balance_wallet,
+                          color: Colors.grey[600],
+                        ),
+                        title: 'Account',
+                        value: account,
+                        needCircleAvatar: true,
+                        onTap: () async{
+                          final selectedAccount = await _showBottomModal(context, const ChangeAccount());
+                          if (selectedAccount != null) {
+                            setState(() {
+                              account = selectedAccount;
+                              fetchCurrencyCode(account);
+                            });
+                          }
+                        },
+                        trailingIcon: Icons.chevron_right,
+                      ),
+                      const CustomListTileDivider(),
+                      CustomListTile(
+                        icon: category.isEmpty
+                            ? Icon(
+                                Icons.category,
+                                color: Colors.grey[600],
+                            )
+                            : SvgPicture.asset(
+                                categoriesData[category]!,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.contain,
+                            ),
+                        title: 'Category',
+                        value: category.isEmpty ? 'Required' : category,
+                        needCircleAvatar: category.isEmpty ? true : false,
+                        onTap: () async {
+                          final selectedCategory = await _showBottomModal(context, const ChangeCategory());
+                          if (selectedCategory != null) {
+                            setState(() {
+                              category = selectedCategory;
+                            });
+                          }
+                        },
+                        trailingIcon: Icons.chevron_right,
+                      ),
+                      const CustomListTileDivider(),
+                      CustomListTile(
+                        icon: Icon(
+                          Icons.calendar_month,
+                          color: Colors.grey[600],
+                        ),
+                        title: 'Date',
+                        value: getFormattedTime(),
+                        needCircleAvatar: true,
+                        onTap: () {},
+                      ),
+                      const SizedBox(height: 14,),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20,),
+                const ModalSubheader(text: "MORE DETAIL"),
+                const SizedBox(height: 15),
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(9)
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 14,),
+                      CustomListTile(
+                        icon: SvgPicture.asset(
+                          "images/modal/payment_type.svg",
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.contain,
+                        ),
+                        title: 'Payment Type',
+                        value: paymentType,
+                        needCircleAvatar: true,
+                        onTap: () async {
+                          final selectedPayment = await _showBottomModal(context, ChangePaymentType(paymentType: paymentType,));
+                          if(selectedPayment != null) {
+                            setState(() {
+                              paymentType = selectedPayment;
+                            });
+                          }
+                        },
+                        trailingIcon: Icons.chevron_right,
+                      ),
+                      const CustomListTileDivider(),
+                      CustomListTile(
+                        icon: Icon(
+                          Icons.person,
+                          color: Colors.grey[600],
+                        ),
+                        title: 'Payee',
+                        value: payee.length > 18 ? "${payee.substring(0, 18)}..." : payee,
+                        needCircleAvatar: true,
+                        onTap: () async {
+                          final payeeName = await _showBottomModal(context, ChangePayee(payee: payee,));
+                          if(payeeName != null) {
+                            setState(() {
+                              payee = payeeName;
+                            });
+                          }
+                        },
+                        trailingIcon: Icons.chevron_right,
+                      ),
+                      const CustomListTileDivider(),
+                      CustomListTile(
+                        icon: Icon(
+                          Icons.location_on,
+                          color: Colors.grey[600],
+                        ),
+                        title: 'Add Location',
+                        value: location.length > 14 ? "${location.substring(0, 14)}..." : location,
+                        needCircleAvatar: true,
+                        onTap: () async {
+                          final Location = await _showBottomModal(context, ChangeLocation(location: location,));
+                          if (Location != null) {
+                            setState(() {
+                              location = Location;
+                            });
+                          }
+                        },
+                        trailingIcon: Icons.chevron_right,
+                      ),
+                      const CustomListTileDivider(),
+                      CustomListTile(
+                        icon: SvgPicture.asset(
+                          "images/modal/note.svg",
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.contain,
+                        ),
+                        title: 'Note',
+                        value: note.length > 20 ? "${note.substring(0, 20)}..." : note,
+                        needCircleAvatar: true,
+                        onTap: () async {
+                          final notes = await _showBottomModal(context, ChangeNote(note: note,));
+                          if (notes != null) {
+                            setState(() {
+                              note = notes;
+                            });
+                          }
+                        },
+                        trailingIcon: Icons.chevron_right,
+                      ),
+                      const SizedBox(height: 14,),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20,),
-            const ModalSubheader(text: "MORE DETAIL"),
-            const SizedBox(height: 15),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(9)
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 14,),
-                  CustomListTile(
-                    icon: SvgPicture.asset(
-                      "images/modal/payment_type.svg",
-                      width: 20,
-                      height: 20,
-                      fit: BoxFit.contain,
-                    ),
-                    title: 'Payment Type',
-                    value: paymentType,
-                    needCircleAvatar: true,
-                    onTap: () async {
-                      final selectedPayment = await _showBottomModal(context, ChangePaymentType(paymentType: paymentType,));
-                      if(selectedPayment != null) {
-                        setState(() {
-                          paymentType = selectedPayment;
-                        });
-                      }
-                    },
-                    trailingIcon: Icons.chevron_right,
-                  ),
-                  const CustomListTileDivider(),
-                  CustomListTile(
-                    icon: Icon(
-                      Icons.person,
-                      color: Colors.grey[600],
-                    ),
-                    title: 'Payee',
-                    value: payee.length > 18 ? "${payee.substring(0, 18)}..." : payee,
-                    needCircleAvatar: true,
-                    onTap: () async {
-                      final payeeName = await _showBottomModal(context, ChangePayee(payee: payee,));
-                      if(payeeName != null) {
-                        setState(() {
-                          payee = payeeName;
-                        });
-                      }
-                    },
-                    trailingIcon: Icons.chevron_right,
-                  ),
-                  const CustomListTileDivider(),
-                  CustomListTile(
-                    icon: Icon(
-                      Icons.location_on,
-                      color: Colors.grey[600],
-                    ),
-                    title: 'Add Location',
-                    value: location.length > 14 ? "${location.substring(0, 14)}..." : location,
-                    needCircleAvatar: true,
-                    onTap: () async {
-                      final Location = await _showBottomModal(context, ChangeLocation(location: location,));
-                      if (Location != null) {
-                        setState(() {
-                          location = Location;
-                        });
-                      }
-                    },
-                    trailingIcon: Icons.chevron_right,
-                  ),
-                  const CustomListTileDivider(),
-                  CustomListTile(
-                    icon: SvgPicture.asset(
-                      "images/modal/note.svg",
-                      width: 20,
-                      height: 20,
-                      fit: BoxFit.contain,
-                    ),
-                    title: 'Note',
-                    value: note.length > 20 ? "${note.substring(0, 20)}..." : note,
-                    needCircleAvatar: true,
-                    onTap: () async {
-                      final notes = await _showBottomModal(context, ChangeNote(note: note,));
-                      if (notes != null) {
-                        setState(() {
-                          note = notes;
-                        });
-                      }
-                    },
-                    trailingIcon: Icons.chevron_right,
-                  ),
-                  const SizedBox(height: 14,),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
