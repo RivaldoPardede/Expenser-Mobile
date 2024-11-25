@@ -65,4 +65,23 @@ class FirestoreService {
     return accountIds;
   }
 
+  Future<String?> getCurrencyCodeFromAccount(String account) async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        final docSnapshot = await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('accounts')
+            .doc(account)
+            .get();
+        return docSnapshot.data()?['currency_code'] as String?;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error getting currency code: $e');
+      return null;
+    }
+  }
 }

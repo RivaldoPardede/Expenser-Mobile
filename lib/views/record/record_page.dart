@@ -31,13 +31,38 @@ class _RecordPageState extends State<RecordPage> {
   final TextEditingController noteController = TextEditingController();
 
   String transactionType = "Expense";
-  String account = "Cash", paymentType = "Cash";
+  String account = "", paymentType = "Cash";
   String category = "", payee = "", note = "", location = "";
   String? userCurrencyCode;
+  bool isLoading = true;
+  List<String> accountIds = [];
 
-  void fetchCurrencyCode() async {
+  void fetchAccountIds() async {
     try {
-      String? currencyCode = await _firestoreService.getCurrencyCodeForUser();
+      List<String> ids = await _firestoreService.getAccountIds();
+      if(ids.isNotEmpty) {
+        setState(() {
+          accountIds = ids;
+          account = ids[0];
+          fetchCurrencyCode(account);
+        });
+      } else {
+        print("No accounts found.");
+      }
+    } catch (e) {
+      print('Error fetching account IDs: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void fetchCurrencyCode(String account) async {
+    try {
+      String? currencyCode = await _firestoreService.getCurrencyCodeFromAccount(account);
+      print(account);
+      print(currencyCode);
       if (currencyCode != null) {
         setState(() {
           userCurrencyCode = currencyCode;
@@ -88,7 +113,7 @@ class _RecordPageState extends State<RecordPage> {
   @override
   void initState() {
     super.initState();
-    fetchCurrencyCode();
+    fetchAccountIds();
   }
 
   @override
@@ -132,11 +157,30 @@ class _RecordPageState extends State<RecordPage> {
                 });
               },
             ),
-            ModalInputAmount(
-              currencyCode: userCurrencyCode,
-              transactionType: transactionType,
-              amountController: amountController,
-            ),
+            isLoading
+              ? Row(
+                children: [
+                  SizedBox(height: 100, width: 18,),
+                  Container(
+                    height: 35,
+                    padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: blackPrimary,
+                      borderRadius: BorderRadius.circular(56),
+                    ),
+                    child: SizedBox(
+                      width: 28,
+                      height: 30,
+                      child: CircularProgressIndicator(color: blue,),
+                    ),
+                  ),
+                ],
+              )
+              : ModalInputAmount(
+                  currencyCode: userCurrencyCode,
+                  transactionType: transactionType,
+                  amountController: amountController,
+                ),
             const SizedBox(height: 20,),
             const ModalSubheader(text: 'GENERAL'),
             const SizedBox(height: 15),
@@ -161,6 +205,7 @@ class _RecordPageState extends State<RecordPage> {
                       if (selectedAccount != null) {
                         setState(() {
                           account = selectedAccount;
+                          fetchCurrencyCode(account);
                         });
                       }
                     },
