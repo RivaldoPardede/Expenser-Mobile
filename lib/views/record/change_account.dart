@@ -28,7 +28,6 @@ class _ChangeAccountState extends State<ChangeAccount> {
       setState(() {
         accountIds = ids;
       });
-      print("dijalankan");
     } catch (e) {
       print('Error fetching account IDs: $e');
     }

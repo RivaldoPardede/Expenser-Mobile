@@ -9,6 +9,7 @@ import 'package:final_project/views/common/modal_toggle_selector.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/record/change_account.dart';
 import 'package:final_project/views/record/change_category.dart';
+import 'package:final_project/views/record/change_payment_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -29,6 +30,7 @@ class _RecordPageState extends State<RecordPage> {
   String transactionType = "Expense";
   String account = "Cash";
   String category = "";
+  String paymentType = "Cash";
   String? userCurrencyCode;
 
   void fetchCurrencyCode() async {
@@ -53,7 +55,7 @@ class _RecordPageState extends State<RecordPage> {
       "transactionType" : transactionType,
       "account" : account,
       "category" : category,
-      "date" : getFormattedTime(),
+      "date" : DateTime.now(),
     };
     print(accountData); // TODO: logic firestore
   }
@@ -149,7 +151,7 @@ class _RecordPageState extends State<RecordPage> {
                     value: account,
                     needCircleAvatar: true,
                     onTap: () async{
-                      final selectedAccount = await _showBottomModal(context, ChangeAccount());
+                      final selectedAccount = await _showBottomModal(context, const ChangeAccount());
                       if (selectedAccount != null) {
                         setState(() {
                           account = selectedAccount;
@@ -158,24 +160,24 @@ class _RecordPageState extends State<RecordPage> {
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  CustomListTileDivider(),
+                  const CustomListTileDivider(),
                   CustomListTile(
                     icon: category.isEmpty
-                            ? Icon(
-                                Icons.category,
-                                color: Colors.grey[600],
-                              )
-                            : SvgPicture.asset(
-                                categoriesData[category]!,
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.contain,
-                              ),
+                        ? Icon(
+                            Icons.category,
+                            color: Colors.grey[600],
+                        )
+                        : SvgPicture.asset(
+                            categoriesData[category]!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.contain,
+                        ),
                     title: 'Category',
                     value: category.isEmpty ? 'Required' : category,
                     needCircleAvatar: category.isEmpty ? true : false,
                     onTap: () async {
-                      final selectedCategory = await _showBottomModal(context, ChangeCategory());
+                      final selectedCategory = await _showBottomModal(context, const ChangeCategory());
                       if (selectedCategory != null) {
                         setState(() {
                           category = selectedCategory;
@@ -184,7 +186,7 @@ class _RecordPageState extends State<RecordPage> {
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  CustomListTileDivider(),
+                  const CustomListTileDivider(),
                   CustomListTile(
                     icon: Icon(
                       Icons.calendar_month,
@@ -194,28 +196,6 @@ class _RecordPageState extends State<RecordPage> {
                     value: getFormattedTime(),
                     needCircleAvatar: true,
                     onTap: () {},
-                  ),
-                  CustomListTileDivider(),
-                  CustomListTile(
-                    icon: SvgPicture.asset(
-                      "images/modal/labels.svg",
-                      width: 20,
-                      height: 20,
-                      fit: BoxFit.contain,
-                    ),
-                    title: 'Labels',
-                    value: '',
-                    needCircleAvatar: true,
-                    onTap: () => showModalBottomSheet<String>(
-                      context: context,
-                      isScrollControlled: true,
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.95,
-                        minHeight: MediaQuery.of(context).size.height * 0.95,
-                      ),
-                      builder: (context) => const ChangeCategory(),
-                    ),
-                    trailingIcon: Icons.add,
                   ),
                   const SizedBox(height: 14,),
                 ],
@@ -240,10 +220,15 @@ class _RecordPageState extends State<RecordPage> {
                       fit: BoxFit.contain,
                     ),
                     title: 'Payment Type',
-                    value: account,
+                    value: paymentType,
                     needCircleAvatar: true,
-                    onTap: () {
-
+                    onTap: () async {
+                      final selectedPayment = await _showBottomModal(context, ChangePaymentType(paymentType: paymentType,));
+                      if(selectedPayment != null) {
+                        setState(() {
+                          paymentType = selectedPayment;
+                        });
+                      }
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
@@ -272,20 +257,6 @@ class _RecordPageState extends State<RecordPage> {
                     needCircleAvatar: true,
                     onTap: () {
 
-                    },
-                    trailingIcon: Icons.chevron_right,
-                  ),
-                  CustomListTileDivider(),
-                  CustomListTile(
-                    icon: Icon(
-                      Icons.photo_camera,
-                      color: Colors.grey[600],
-                    ),
-                    title: 'Attach photo',
-                    value: '',
-                    needCircleAvatar: true,
-                    onTap: () {
-                      // Open Labels Modal
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
