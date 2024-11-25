@@ -14,6 +14,8 @@ class ChangeAccount extends StatefulWidget {
 
 class _ChangeAccountState extends State<ChangeAccount> {
   final FirestoreService _firestoreService = FirestoreService();
+
+  bool isLoading = true;
   List<String> accountIds = [];
 
   @override
@@ -30,6 +32,10 @@ class _ChangeAccountState extends State<ChangeAccount> {
       });
     } catch (e) {
       print('Error fetching account IDs: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -64,34 +70,48 @@ class _ChangeAccountState extends State<ChangeAccount> {
                   color: white,
                   borderRadius: BorderRadius.circular(9)
               ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 14,),
-                  ...accountIds.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final id = entry.value;
-
-                    return Column(
+              child: isLoading
+                  ? Column(
+                    children: [
+                      const SizedBox(height: 28,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox.shrink(),
+                          CircularProgressIndicator(color: blue,),
+                        ],
+                      ),
+                      const SizedBox(height: 28,),
+                    ],
+                  )
+                  : Column(
                       children: [
-                        CustomListTile(
-                          icon: Icon(
-                            Icons.account_balance_wallet,
-                            color: Colors.grey[600],
-                          ),
-                          title: id,
-                          value: "",
-                          needCircleAvatar: true,
-                          onTap: () {
-                            Navigator.pop(context, id);
-                          },
-                        ),
-                        if (index != accountIds.length - 1)
-                          const CustomListTileDivider(),
+                        const SizedBox(height: 14,),
+                        ...accountIds.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final id = entry.value;
+
+                          return Column(
+                            children: [
+                              CustomListTile(
+                                icon: Icon(
+                                  Icons.account_balance_wallet,
+                                  color: Colors.grey[600],
+                                ),
+                                title: id,
+                                value: "",
+                                needCircleAvatar: true,
+                                onTap: () {
+                                  Navigator.pop(context, id);
+                                },
+                              ),
+                              if (index != accountIds.length - 1)
+                                const CustomListTileDivider(),
+                            ],
+                          );
+                        }).toList(),
+                        const SizedBox(height: 14,),
                       ],
-                    );
-                  }).toList(),
-                  const SizedBox(height: 14,),
-                ],
               ),
             ),
           ],
