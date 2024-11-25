@@ -38,6 +38,7 @@ flutter:
   assets:
     - images/
     - images/home/
+    - images/modal/
 
   fonts:
     - family: Inter

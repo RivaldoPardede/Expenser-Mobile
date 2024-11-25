@@ -1,5 +1,5 @@
-import 'package:final_project/views/add.dart';
 import 'package:final_project/views/home/home_page.dart';
+import 'package:final_project/views/record/record_page.dart';
 import 'package:final_project/views/settings/settings_page.dart';
 import 'package:final_project/views/statistic/statistic_page.dart';
 import 'package:final_project/views/transaction/transaction_page.dart';
@@ -26,7 +26,7 @@ class _MainScreenState extends State<MainScreen> {
   late final List<NavModel> items = [
     NavModel(page: const HomePage(), navKey: homeNavKey),
     NavModel(page: const StatisticPage(), navKey: statisticNavKey),
-    NavModel(page: const Add(), navKey: GlobalKey<NavigatorState>()), // FAB
+    NavModel(page: const RecordPage(), navKey: GlobalKey<NavigatorState>()), // FAB
     NavModel(page: const TransactionPage(), navKey: transactionHistoryNavKey),
     NavModel(page: const SettingsPage(), navKey: settingsNavKey),
   ];
@@ -56,7 +56,14 @@ class _MainScreenState extends State<MainScreen> {
           }).toList(),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => setState(() => selectedTab = 2),
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.95,
+            ),
+            builder: (context) => const RecordPage(),
+          ),
           backgroundColor: const Color(0xFF5B9EE1),
           elevation: 5,
           shape: const CircleBorder(),
