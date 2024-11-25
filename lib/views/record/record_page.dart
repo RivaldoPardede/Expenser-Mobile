@@ -61,8 +61,6 @@ class _RecordPageState extends State<RecordPage> {
   void fetchCurrencyCode(String account) async {
     try {
       String? currencyCode = await _firestoreService.getCurrencyCodeFromAccount(account);
-      print(account);
-      print(currencyCode);
       if (currencyCode != null) {
         setState(() {
           userCurrencyCode = currencyCode;

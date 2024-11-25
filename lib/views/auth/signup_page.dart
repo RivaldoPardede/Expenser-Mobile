@@ -5,6 +5,7 @@ import 'package:final_project/views/auth/signin_page.dart';
 import 'package:final_project/views/auth/widgets/auth_button.dart';
 import 'package:final_project/views/auth/widgets/input_field.dart';
 import 'package:final_project/views/common/custom_header.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:final_project/providers/auth_provider.dart';
@@ -126,7 +127,27 @@ class _SignupPageState extends State<SignupPage> {
                               MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
                             );
                           });
-                        } catch (e) {
+                        } on firebase_auth.FirebaseAuthException catch (e){
+                          String? errorMessage = e.message;
+                          switch (e.code) {
+                            case 'weak-password':
+                              errorMessage = 'The password is too weak.';
+                              break;
+                            case 'email-already-in-use':
+                              errorMessage = 'The email is already registered.';
+                              break;
+                            default:
+                              errorMessage = e.message;
+                              break;
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(errorMessage!),
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 4),
+                            ),
+                          );
+                        }catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("Failed to sign up: ${e.toString()}"),

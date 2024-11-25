@@ -18,12 +18,7 @@ class Auth {
       await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       await _firebaseAuth.currentUser?.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        throw Exception('The password is too weak.');
-      } else if (e.code =='email-already-in-use') {
-        throw Exception('The email is already registered.');
-      }
-      throw Exception('An Error occurred during sign-up. $e');
+      throw FirebaseAuthException(code: e.code, message: e.message);
     }
   }
 
@@ -35,7 +30,10 @@ class Auth {
       );
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.message ?? "An error occurred while signing in.");
+      throw FirebaseAuthException(
+        code: e.code,
+        message: e.message,
+      );
     }
   }
 
