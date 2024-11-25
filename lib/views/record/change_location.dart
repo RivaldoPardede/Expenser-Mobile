@@ -2,28 +2,28 @@ import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/record/widgets/add_text_field.dart';
 import 'package:flutter/material.dart';
 
-class ChangePayee extends StatefulWidget {
+class ChangeLocation extends StatefulWidget {
 
-  final String payee;
+  final String location;
 
-  const ChangePayee({
+  const ChangeLocation({
     super.key,
-    required this.payee
+    required this.location,
   });
 
   @override
-  State<ChangePayee> createState() => _ChangePayeeState();
+  State<ChangeLocation> createState() => _ChangeLocationState();
 }
 
-class _ChangePayeeState extends State<ChangePayee> {
+class _ChangeLocationState extends State<ChangeLocation> {
 
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    if(widget.payee.isNotEmpty) {
-      _nameController.text = widget.payee;
+    if(widget.location.isNotEmpty) {
+      _locationController.text = widget.location;
     }
   }
 
@@ -41,12 +41,12 @@ class _ChangePayeeState extends State<ChangePayee> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ModalHeader(
-              title: "Name",
+              title: "Location",
               cancelText: "Back",
               isleadingIcon: true,
               addText: "Save",
               onAdd: () {
-                Navigator.pop(context, _nameController.text);
+                Navigator.pop(context, _locationController.text);
               },
               onCancel: () {
                 Navigator.pop(context);
@@ -58,9 +58,9 @@ class _ChangePayeeState extends State<ChangePayee> {
             ),
             const SizedBox(height: 20,),
             AddTextField(
-              titleText: "Payee Name",
-              hintText: "Enter payee name here...",
-              controller: _nameController,
+              titleText: "Add location",
+              hintText: "Enter your location here...",
+              controller: _locationController,
             ),
           ],
         ),

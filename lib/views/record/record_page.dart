@@ -9,6 +9,8 @@ import 'package:final_project/views/common/modal_toggle_selector.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/record/change_account.dart';
 import 'package:final_project/views/record/change_category.dart';
+import 'package:final_project/views/record/change_location.dart';
+import 'package:final_project/views/record/change_note.dart';
 import 'package:final_project/views/record/change_payee.dart';
 import 'package:final_project/views/record/change_payment_type.dart';
 import 'package:flutter/material.dart';
@@ -29,10 +31,8 @@ class _RecordPageState extends State<RecordPage> {
   final TextEditingController noteController = TextEditingController();
 
   String transactionType = "Expense";
-  String account = "Cash";
-  String category = "";
-  String paymentType = "Cash";
-  String payee = "";
+  String account = "Cash", paymentType = "Cash";
+  String category = "", payee = "", note = "", location = "";
   String? userCurrencyCode;
 
   void fetchCurrencyCode() async {
@@ -53,11 +53,15 @@ class _RecordPageState extends State<RecordPage> {
   void _saveRecord() {
     int? amount = int.tryParse(amountController.text.replaceAll('-', '').replaceAll('+', ''));
     final accountData = {
-      "amount" : amount,
       "transactionType" : transactionType,
+      "amount" : amount,
       "account" : account,
       "category" : category,
       "date" : DateTime.now(),
+      "paymentType" : paymentType,
+      "payee" : payee,
+      "location" : location,
+      "note" : note,
     };
     print(accountData); // TODO: logic firestore
   }
@@ -260,10 +264,15 @@ class _RecordPageState extends State<RecordPage> {
                       color: Colors.grey[600],
                     ),
                     title: 'Add Location',
-                    value: "",
+                    value: location.length > 14 ? "${location.substring(0, 14)}..." : location,
                     needCircleAvatar: true,
-                    onTap: () {
-
+                    onTap: () async {
+                      final Location = await _showBottomModal(context, ChangeLocation(location: location,));
+                      if (Location != null) {
+                        setState(() {
+                          location = Location;
+                        });
+                      }
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
@@ -276,10 +285,15 @@ class _RecordPageState extends State<RecordPage> {
                       fit: BoxFit.contain,
                     ),
                     title: 'Note',
-                    value: '',
+                    value: note.length > 20 ? "${note.substring(0, 20)}..." : note,
                     needCircleAvatar: true,
-                    onTap: () {
-                      // Open Labels Modal
+                    onTap: () async {
+                      final notes = await _showBottomModal(context, ChangeNote(note: note,));
+                      if (notes != null) {
+                        setState(() {
+                          note = notes;
+                        });
+                      }
                     },
                     trailingIcon: Icons.chevron_right,
                   ),

@@ -2,28 +2,28 @@ import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/record/widgets/add_text_field.dart';
 import 'package:flutter/material.dart';
 
-class ChangePayee extends StatefulWidget {
+class ChangeNote extends StatefulWidget {
 
-  final String payee;
+  final String note;
 
-  const ChangePayee({
+  const ChangeNote({
     super.key,
-    required this.payee
+    required this.note,
   });
 
   @override
-  State<ChangePayee> createState() => _ChangePayeeState();
+  State<ChangeNote> createState() => _ChangeNoteState();
 }
 
-class _ChangePayeeState extends State<ChangePayee> {
+class _ChangeNoteState extends State<ChangeNote> {
 
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    if(widget.payee.isNotEmpty) {
-      _nameController.text = widget.payee;
+    if(widget.note.isNotEmpty) {
+      _noteController.text = widget.note;
     }
   }
 
@@ -41,12 +41,12 @@ class _ChangePayeeState extends State<ChangePayee> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ModalHeader(
-              title: "Name",
+              title: "Note",
               cancelText: "Back",
               isleadingIcon: true,
               addText: "Save",
               onAdd: () {
-                Navigator.pop(context, _nameController.text);
+                Navigator.pop(context, _noteController.text);
               },
               onCancel: () {
                 Navigator.pop(context);
@@ -58,9 +58,9 @@ class _ChangePayeeState extends State<ChangePayee> {
             ),
             const SizedBox(height: 20,),
             AddTextField(
-              titleText: "Payee Name",
-              hintText: "Enter payee name here...",
-              controller: _nameController,
+              titleText: "Add note",
+              hintText: "Enter your note here...",
+              controller: _noteController,
             ),
           ],
         ),
