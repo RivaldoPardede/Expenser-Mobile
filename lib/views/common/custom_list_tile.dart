@@ -10,14 +10,14 @@ class CustomListTile extends StatefulWidget {
   final IconData? trailingIcon;
 
   const CustomListTile({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.value,
     required this.needCircleAvatar,
     required this.onTap,
     this.trailingIcon,
-  }) : super(key: key);
+  });
 
   @override
   _CustomListTileState createState() => _CustomListTileState();
@@ -79,6 +79,7 @@ class _CustomListTileState extends State<CustomListTile> {
               children: [
                 Text(
                   widget.value,
+                  maxLines: 1,
                   style: TextStyle(
                     fontSize: 16,
                     color: widget.value == "Required"

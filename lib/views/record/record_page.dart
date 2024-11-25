@@ -9,6 +9,7 @@ import 'package:final_project/views/common/modal_toggle_selector.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/record/change_account.dart';
 import 'package:final_project/views/record/change_category.dart';
+import 'package:final_project/views/record/change_payee.dart';
 import 'package:final_project/views/record/change_payment_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,6 +32,7 @@ class _RecordPageState extends State<RecordPage> {
   String account = "Cash";
   String category = "";
   String paymentType = "Cash";
+  String payee = "";
   String? userCurrencyCode;
 
   void fetchCurrencyCode() async {
@@ -232,21 +234,26 @@ class _RecordPageState extends State<RecordPage> {
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  CustomListTileDivider(),
+                  const CustomListTileDivider(),
                   CustomListTile(
                     icon: Icon(
                       Icons.person,
                       color: Colors.grey[600],
                     ),
                     title: 'Payee',
-                    value: '',
+                    value: payee.length > 18 ? "${payee.substring(0, 18)}..." : payee,
                     needCircleAvatar: true,
-                    onTap: () {
-
+                    onTap: () async {
+                      final payeeName = await _showBottomModal(context, ChangePayee(payee: payee,));
+                      if(payeeName != null) {
+                        setState(() {
+                          payee = payeeName;
+                        });
+                      }
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  CustomListTileDivider(),
+                  const CustomListTileDivider(),
                   CustomListTile(
                     icon: Icon(
                       Icons.location_on,
@@ -260,7 +267,7 @@ class _RecordPageState extends State<RecordPage> {
                     },
                     trailingIcon: Icons.chevron_right,
                   ),
-                  CustomListTileDivider(),
+                  const CustomListTileDivider(),
                   CustomListTile(
                     icon: SvgPicture.asset(
                       "images/modal/note.svg",
