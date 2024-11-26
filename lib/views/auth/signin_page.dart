@@ -103,11 +103,17 @@ class _SigninPageState extends State<SigninPage> {
                       style: buttonPrimary,
                       onPressed: isFormValid
                           ? () async {
+                        setState(() {
+                          isLoading = true;
+                        });
                         await Provider.of<AuthProvider>(context, listen: false).signInWithEmailAndPassword(
                           context,
                           _emailController.text.trim(),
                           _passwordController.text.trim(),
                         );
+                        setState(() {
+                          isLoading = false;
+                        });
                       }: null,
                       child: isLoading
                           ? const SizedBox(
