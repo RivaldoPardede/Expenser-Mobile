@@ -144,6 +144,7 @@ class _RecordPageState extends State<RecordPage> {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(29)),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Padding(
           padding: EdgeInsets.only(
             left: 16,
