@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:final_project/views/statistic/widgets/financial_health_score.dart';
 import './widgets/financial_factor_card.dart';
+import 'financial_history_page.dart';
 
 class StatisticPage extends StatefulWidget {
   const StatisticPage({super.key});
@@ -80,7 +81,10 @@ class _StatisticPageState extends State<StatisticPage> {
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            // TODO: Implement financial history action
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const FinancialHistoryPage()),
+                          );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF4391DE),

@@ -24,6 +24,7 @@ dependencies:
   currency_textfield: ^4.14.1
   google_sign_in: ^6.2.2
   syncfusion_flutter_gauges: ^27.2.3
+  pie_chart: ^5.0.1
 
 dev_dependencies:
   flutter_test:
