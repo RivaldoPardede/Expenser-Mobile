@@ -32,6 +32,7 @@ class InputField extends StatelessWidget {
           fontSize: 16,
           color: grey
         ),
+        cursorColor: blue,
         controller: controller,
         obscureText: isPassword,
         decoration: InputDecoration(

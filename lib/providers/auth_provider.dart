@@ -47,9 +47,61 @@ class AuthProvider with ChangeNotifier {
             MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
           );
         }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Incorrect email or password. Please check your email and password and try again.")),
+        );
       }
     } catch (e) {
-      throw Exception(e.toString());
+      String errorMessage = "An error occurred. Please try again later.";
+
+      // Handle specific exception cases based on type or message
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'invalid-email':
+            errorMessage = "The email address is badly formatted.";
+            break;
+          case 'user-disabled':
+            errorMessage = "This user account has been disabled.";
+            break;
+          case 'user-not-found':
+            errorMessage = "No user found for that email address.";
+            break;
+          case 'wrong-password':
+            errorMessage = "Incorrect password provided. Please try again.";
+            break;
+          case 'invalid-credential':
+            errorMessage = "Incorrect email or password. Please check your email and password and try again.";
+            break;
+          default:
+            errorMessage = e.code;
+            break;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      } else if (e is FormatException) {
+        errorMessage = "The email address is badly formatted.";
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      } else if (e is Exception) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
     }
   }
 

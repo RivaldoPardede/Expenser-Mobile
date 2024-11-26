@@ -5,6 +5,7 @@ import 'package:final_project/views/auth/signin_page.dart';
 import 'package:final_project/views/auth/widgets/auth_button.dart';
 import 'package:final_project/views/auth/widgets/input_field.dart';
 import 'package:final_project/views/common/custom_header.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:final_project/providers/auth_provider.dart';
@@ -21,7 +22,7 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _retypePasswordController = TextEditingController();
-  bool isFormValid = false;
+  bool isFormValid = false, isLoading = false;
 
   @override
   void initState() {
@@ -113,7 +114,13 @@ class _SignupPageState extends State<SignupPage> {
                       onPressed: isFormValid
                           ? () async {
                         try {
+                          setState(() {
+                            isLoading = true;
+                          });
                           await authProvider.signUp(_emailController.text, _passwordController.text);
+                          setState(() {
+                            isLoading = false;
+                          });
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("Verification email sent! Please check your inbox."),
@@ -126,7 +133,33 @@ class _SignupPageState extends State<SignupPage> {
                               MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
                             );
                           });
-                        } catch (e) {
+                        } on firebase_auth.FirebaseAuthException catch (e){
+                          String? errorMessage = e.message;
+                          switch (e.code) {
+                            case 'weak-password':
+                              errorMessage = 'The password is too weak.';
+                              break;
+                            case 'email-already-in-use':
+                              errorMessage = 'The email is already registered.';
+                              break;
+                            default:
+                              errorMessage = e.message;
+                              break;
+                          }
+                          setState(() {
+                            isLoading = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(errorMessage!),
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 4),
+                            ),
+                          );
+                        }catch (e) {
+                          setState(() {
+                            isLoading = false;
+                          });
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("Failed to sign up: ${e.toString()}"),
@@ -137,7 +170,15 @@ class _SignupPageState extends State<SignupPage> {
                         }
                       }
                           : null,
-                      child: const Text('Sign Up'),
+                      child: isLoading
+                          ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.0,
+                        ),
+                      ) : const Text('Sign Up'),
                     ),
                   ),
                   const SizedBox(height: 10),
