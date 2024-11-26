@@ -73,9 +73,9 @@ class _RecordPageState extends State<RecordPage> {
     }
   }
 
-  void _saveRecord(BuildContext modalContext) {
+  Future<void> _saveRecord(BuildContext modalContext) async {
     int? amount = int.tryParse(amountController.text.replaceAll('-', '').replaceAll('+', ''));
-    final accountData = {
+    final recordData = {
       "transactionType" : transactionType,
       "amount" : amount,
       "account" : account,
@@ -86,31 +86,35 @@ class _RecordPageState extends State<RecordPage> {
       "location" : location,
       "note" : note,
     };
-    print(accountData); // TODO: logic firestore
 
-    if (accountData["amount"] == null) {
+    if (recordData["amount"] == null) {
       ScaffoldMessenger.of(modalContext).showSnackBar(
         const SnackBar(content: Text("Record Amount must not be 0")),
       );
-    } else if (accountData["category"] == null || accountData["category"] == "") {
+    } else if (recordData["category"] == null || recordData["category"] == "") {
       ScaffoldMessenger.of(modalContext).showSnackBar(
         const SnackBar(content: Text("Record Category must not be empty")),
       );
-    } else if(accountData["paymentType"] == "") {
+    } else if(recordData["paymentType"] == "") {
       ScaffoldMessenger.of(modalContext).showSnackBar(
         const SnackBar(content: Text("Record Payment Type must not be empty")),
       );
-    } else if(accountData["Account"] == "") {
+    } else if(recordData["Account"] == "") {
       ScaffoldMessenger.of(modalContext).showSnackBar(
         const SnackBar(content: Text("Record Account must not be empty")),
       );
     } else{
-      // TODO: logic firestore
-      Navigator.pop(modalContext);
+      try {
+        await _firestoreService.addTransaction(recordData["account"].toString(), recordData);
+        Navigator.pop(modalContext);
 
-      ScaffoldMessenger.of(modalContext).showSnackBar(
-        const SnackBar(content: Text("Record saved successfully"), behavior: SnackBarBehavior.floating,),
-      );
+        ScaffoldMessenger.of(modalContext).showSnackBar(
+          const SnackBar(content: Text("Record saved successfully"),
+            behavior: SnackBarBehavior.floating,),
+        );
+      } catch (e) {
+        print("Error saving record: $e");
+      }
     }
   }
 

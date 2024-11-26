@@ -84,4 +84,22 @@ class FirestoreService {
       return null;
     }
   }
+
+  Future<void> addTransaction(String accountId, Map<String, dynamic> recordData) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final recordRef = FirebaseFirestore.instance
+        .collection('transactions');
+
+    final accountRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('accounts')
+        .doc(accountId);
+
+    // Add a new document with a generated ID
+    await recordRef.add({
+      ...recordData,
+      'accountReference': accountRef,
+    });
+  }
 }
