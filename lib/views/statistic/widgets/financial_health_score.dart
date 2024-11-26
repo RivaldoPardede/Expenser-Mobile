@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+
+import '../../../styles/color.dart';
 
 Widget financialHealthScore() {
   return Card(
+    color: Colors.white,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18.0),
@@ -11,15 +15,13 @@ Widget financialHealthScore() {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "9 October 2024",
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-              IconButton(
-                icon: const Icon(Icons.help_outlined, color: Colors.blue),
-                onPressed: () {
-                  // Implement help action
-                },
+               Text(
+                DateFormat('d MMMM yyyy').format(DateTime.now()),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: darkGrey,
+                  fontWeight: FontWeight.w500
+                ),
               ),
             ],
           ),
@@ -107,7 +109,7 @@ Widget _buildScoreLegend() {
   ];
 
   return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
     children: legendItems.map((item) {
       return Column(
         children: [

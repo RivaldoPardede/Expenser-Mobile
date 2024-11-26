@@ -1,3 +1,4 @@
+import 'package:final_project/styles/color.dart';
 import 'package:flutter/material.dart';
 
 Widget financialFactorCard() {
@@ -5,10 +6,11 @@ Widget financialFactorCard() {
     {"label": "Savings", "percentage": "30%", "status": "Overall good", "color": Colors.yellow},
     {"label": "Expenses", "percentage": "20%", "status": "Enough", "color": Colors.yellow},
     {"label": "Investments", "percentage": "35%", "status": "So Good", "color": Colors.blue},
-    {"label": "Debt", "percentage": "15%", "status": "Needs Attention", "color": Colors.red},
+    {"label": "Income", "percentage": "15%", "status": "Needs Attention", "color": Colors.red},
   ];
 
   return GridView.builder(
+    padding: EdgeInsets.zero,
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -21,6 +23,7 @@ Widget financialFactorCard() {
     itemBuilder: (context, index) {
       final factor = factors[index];
       return Card(
+        color: lightGrey,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         child: Row(
           children: [
