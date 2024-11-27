@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class LanguageDialog {
   static void showLanguageSelection(BuildContext context) {
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

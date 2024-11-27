@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'language_dialog.dart'; // Pastikan file LanguageDialog sudah ada
 import 'record_page.dart'; // Pastikan file RecordPage sudah ada
 
@@ -41,42 +42,62 @@ class MyProfilePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Profile Information
-              Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(
-                        'https://via.placeholder.com/150'), // Ganti dengan URL gambar
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Dhea Tania Salsabila',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+              Card(
+                elevation: 4, // Tambahkan sedikit elevation untuk efek bayangan
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(7.0),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(
+                            'https://via.placeholder.com/150'), // Ganti dengan URL gambar
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'Dhea Tania Salsabila',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'dheataniassalsabila@gmail.com',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text(
+                          'Edit Profile',
+                          style: TextStyle(fontSize: 12, color: Colors.white), // Mengubah ukuran teks
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue, // Mengubah warna tombol menjadi biru
+                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Mengatur ukuran tombol
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0), // Menambahkan sudut membulat
                           ),
                         ),
-                        Text(
-                          'dheataniassalsabila@gmail.com',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
+                      )
+                    ],
                   ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: const Text('Edit Profile'),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 18),
 
               // Settings Title
               const Text(
@@ -88,51 +109,87 @@ class MyProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Settings Options
-              buildSettingsOption(
-                context,
-                icon: Icons.notifications,
-                title: 'Notification',
-                trailing: Switch(
-                  value: true,
-                  onChanged: (value) {},
+              // Card containing all Settings Options
+              Card(
+                elevation: 4, // Elevation for the whole settings options card
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-              const Divider(),
-              buildSettingsOption(
-                context,
-                icon: Icons.language,
-                title: 'Language',
-                onTap: () {
-                  // Tampilkan dialog pemilihan bahasa
-                  LanguageDialog.showLanguageSelection(context);
-                },
-              ),
-              const Divider(),
-              buildSettingsOption(
-                context,
-                icon: Icons.record_voice_over,
-                title: 'Record',
-                onTap: () {
-                  // Navigasi ke halaman RecordPage
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const RecordPage()),
-                  );
-                },
-              ),
-              const Divider(),
-              buildSettingsOption(
-                context,
-                icon: Icons.security,
-                title: 'Security & Password',
-              ),
-              const Divider(),
-              buildSettingsOption(
-                context,
-                icon: Icons.logout,
-                title: 'Logout',
-                iconColor: Colors.red,
+                color: Colors.white, // Set the background color to white
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Column(
+                    children: [
+                      buildSettingsOption(
+                        context,
+                        icon: SvgPicture.asset(
+                          'images/notification.svg', // Ganti dengan path gambar Anda
+                          width: 30,
+                          height: 30,
+                        ),
+                        title: 'Notification',
+                        trailing: Switch(
+                          value: true,
+                          activeColor: Colors.green,
+                          onChanged: (value) {
+                            print('Notification toggled: $value');
+                          },
+                        ),
+                      ),
+                      const Divider(),
+                      buildSettingsOption(
+                        context,
+                        icon: SvgPicture.asset(
+                          'images/language.svg', // Ganti dengan path gambar Anda
+                          width: 30,
+                          height: 30,
+                        ),
+                        title: 'Language',
+                        onTap: () {
+                          // Tampilkan dialog pemilihan bahasa
+                          LanguageDialog.showLanguageSelection(context);
+                        },
+                      ),
+                      const Divider(),
+                      buildSettingsOption(
+                        context,
+                        icon: SvgPicture.asset(
+                          'images/record.svg', // Ganti dengan path gambar Anda
+                          width: 30,
+                          height: 30,
+                        ),
+                        title: 'Record',
+                        onTap: () {
+                          // Navigasi ke halaman RecordPage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const RecordPage()),
+                          );
+                        },
+                      ),
+                      const Divider(),
+                      buildSettingsOption(
+                        context,
+                        icon: SvgPicture.asset(
+                          'images/Shield Keyhole.svg', // Ganti dengan path gambar Anda
+                          width: 30,
+                          height: 30,
+                        ),
+                        title: 'Security & Password',
+                      ),
+                      const Divider(),
+                      buildSettingsOption(
+                        context,
+                        icon: SvgPicture.asset(
+                          'images/logout.svg', // Ganti dengan path gambar Anda
+                          width: 30,
+                          height: 30,
+                        ),
+                        title: 'Logout',
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -142,25 +199,26 @@ class MyProfilePage extends StatelessWidget {
   }
 
   Widget buildSettingsOption(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    Widget? trailing,
-    Color iconColor = Colors.blue,
-    VoidCallback? onTap,
-  }) {
+      BuildContext context, {
+        required Widget icon, // Ubah tipe menjadi Widget
+        required String title,
+        Widget? trailing,
+        VoidCallback? onTap,
+      }) {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Padding setiap item
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start, // Mengubah alignment menjadi start (kiri)
           children: [
-            Icon(icon, color: iconColor),
+            icon,
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
                 style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.left, // Menjadikan teks di kiri
               ),
             ),
             if (trailing != null) trailing,

@@ -5,6 +5,7 @@ void showDeleteConfirmation(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
+        backgroundColor: Colors.white,
         title: const Text('Are you sure?'),
         content: const Text('Do you really want to delete this record?'),
         actions: [
