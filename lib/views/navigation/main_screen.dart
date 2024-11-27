@@ -1,6 +1,6 @@
 import 'package:final_project/views/home/home_page.dart';
 import 'package:final_project/views/record/record_page.dart';
-import 'package:final_project/views/settings/settings_page.dart';
+import 'package:final_project/views/settings/settings.dart';
 import 'package:final_project/views/statistic/statistic_page.dart';
 import 'package:final_project/views/transaction/transaction_page.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
     NavModel(page: const StatisticPage(), navKey: statisticNavKey),
     NavModel(page: const RecordPage(), navKey: GlobalKey<NavigatorState>()), // FAB
     NavModel(page: const TransactionPage(), navKey: transactionHistoryNavKey),
-    NavModel(page: const SettingsPage(), navKey: settingsNavKey),
+    NavModel(page: const Settings(), navKey: settingsNavKey),
   ];
 
   @override
