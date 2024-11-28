@@ -74,7 +74,7 @@ class _RecordPageState extends State<RecordPage> {
   }
 
   Future<void> _saveRecord(BuildContext modalContext) async {
-    int? amount = int.tryParse(amountController.text.replaceAll('-', '').replaceAll('+', ''));
+    double? amount = double.tryParse(amountController.text.replaceAll('-', '').replaceAll('+', ''));
     final recordData = {
       "transactionType" : transactionType,
       "amount" : amount,
