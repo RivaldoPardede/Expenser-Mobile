@@ -320,7 +320,7 @@ class _RecordPageState extends State<RecordPage> {
                           color: Colors.grey[600],
                         ),
                         title: 'Payee',
-                        value: payee.length > 18 ? "${payee.substring(0, 18)}..." : payee,
+                        value: payee,
                         needCircleAvatar: true,
                         onTap: () async {
                           final payeeName = await _showBottomModal(context, ChangePayee(payee: payee,));
@@ -339,7 +339,7 @@ class _RecordPageState extends State<RecordPage> {
                           color: Colors.grey[600],
                         ),
                         title: 'Add Location',
-                        value: location.length > 14 ? "${location.substring(0, 14)}..." : location,
+                        value: location,
                         needCircleAvatar: true,
                         onTap: () async {
                           final Location = await _showBottomModal(context, ChangeLocation(location: location,));
@@ -360,7 +360,7 @@ class _RecordPageState extends State<RecordPage> {
                           fit: BoxFit.contain,
                         ),
                         title: 'Note',
-                        value: note.length > 20 ? "${note.substring(0, 20)}..." : note,
+                        value: note,
                         needCircleAvatar: true,
                         onTap: () async {
                           final notes = await _showBottomModal(context, ChangeNote(note: note,));

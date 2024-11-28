@@ -77,15 +77,21 @@ class _CustomListTileState extends State<CustomListTile> {
             // Trailing Text and Icon
             Row(
               children: [
-                Text(
-                  widget.value,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: widget.value == "Required"
-                        ? Colors.red
-                        : isTapped ? blackPrimary : Colors.grey[800],
-                    fontWeight: isTapped ? FontWeight.w700 : FontWeight.normal
+                Container(
+                  width: 130,
+                  child: Text(
+                    widget.value,
+                    maxLines: 1,
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: widget.value == "Required"
+                          ? Colors.red
+                          : isTapped ? blackPrimary : Colors.grey[800],
+                      fontWeight: isTapped ? FontWeight.w700 : FontWeight.normal
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
