@@ -1,3 +1,4 @@
+import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/styles/color.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/common/custom_list_tile_divider.dart';
@@ -17,8 +18,26 @@ class AddAccount extends StatefulWidget {
 }
 
 class _AddAccountState extends State<AddAccount> {
+  final FirestoreService _firestoreService = FirestoreService();
+
   String accountName = "";
   double accountBalance = 0.00;
+  String? userCurrencyCode;
+
+  void fetchCurrencyCode() async {
+    try {
+      String? currencyCode = await _firestoreService.getCurrencyCodeForUser();
+      if (currencyCode != null) {
+        setState(() {
+          userCurrencyCode = currencyCode;
+        });
+      } else {
+        print("Currency code not found for the user.");
+      }
+    } catch (e) {
+      print("Error fetching currency code: $e");
+    }
+  }
 
   Future<String?> _showBottomModal(BuildContext context, Widget destination) {
     return showModalBottomSheet<String>(
@@ -30,6 +49,11 @@ class _AddAccountState extends State<AddAccount> {
       ),
       builder: (context) => destination,
     );
+  }
+
+  void initState() {
+    super.initState();
+    fetchCurrencyCode();
   }
 
   @override
@@ -120,7 +144,7 @@ class _AddAccountState extends State<AddAccount> {
                       fit: BoxFit.contain,
                     ),
                     title: "Currency",
-                    value: "IDR",
+                    value: userCurrencyCode ?? "",
                     valueWidth: 150,
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,

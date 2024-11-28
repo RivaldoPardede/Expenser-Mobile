@@ -128,6 +128,7 @@ class _AddBalanceState extends State<AddBalance> {
                       ),
                     ),
                   ),
+                SizedBox(width: 15,),
                 Expanded(
                   child: TextFormField(
                     showCursor: false,
