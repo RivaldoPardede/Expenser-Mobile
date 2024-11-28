@@ -190,16 +190,16 @@ class _RecordPageState extends State<RecordPage> {
                 isLoading
                   ? Row(
                     children: [
-                      SizedBox(height: 100, width: 18,),
+                      const SizedBox(height: 100, width: 18,),
                       Container(
                         height: 35,
-                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 25),
                         decoration: BoxDecoration(
                           color: blackPrimary,
                           borderRadius: BorderRadius.circular(56),
                         ),
                         child: SizedBox(
-                          width: 28,
+                          width: 22,
                           height: 30,
                           child: CircularProgressIndicator(color: blue,),
                         ),

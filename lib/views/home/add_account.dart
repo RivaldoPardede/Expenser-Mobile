@@ -3,6 +3,7 @@ import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/common/custom_list_tile_divider.dart';
 import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/home/add_account_name.dart';
+import 'package:final_project/views/home/add_balance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -17,6 +18,7 @@ class AddAccount extends StatefulWidget {
 
 class _AddAccountState extends State<AddAccount> {
   String accountName = "";
+  double accountBalance = 0.00;
 
   Future<String?> _showBottomModal(BuildContext context, Widget destination) {
     return showModalBottomSheet<String>(
@@ -97,10 +99,15 @@ class _AddAccountState extends State<AddAccount> {
                       fit: BoxFit.contain,
                     ),
                     title: "Current balance",
-                    value: "0,00",
+                    value: accountBalance.toString(),
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,
-                    onTap: () {},
+                    onTap: () async{
+                      final balance = await _showBottomModal(context, AddBalance(balance: accountBalance,));
+                      if (balance != null) {
+                        accountBalance = double.tryParse(balance)!;
+                      }
+                    },
                   ),
                   const CustomListTileDivider(),
                   CustomListTile(
