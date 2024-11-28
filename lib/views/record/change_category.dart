@@ -61,6 +61,7 @@ class _ChangeCategoryState extends State<ChangeCategory> {
                       ),
                       title: entry.key,
                       value: "",
+                      valueWidth: 0,
                       needCircleAvatar: false,
                       onTap: () {
                         Navigator.pop(context, entry.key);

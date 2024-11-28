@@ -100,6 +100,7 @@ class _ChangeAccountState extends State<ChangeAccount> {
                                 ),
                                 title: id,
                                 value: "",
+                                valueWidth: 0,
                                 needCircleAvatar: true,
                                 onTap: () {
                                   Navigator.pop(context, id);

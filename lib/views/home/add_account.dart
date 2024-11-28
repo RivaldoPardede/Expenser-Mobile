@@ -79,6 +79,7 @@ class _AddAccountState extends State<AddAccount> {
                     value: accountName.isEmpty
                         ? "Required"
                         : accountName,
+                    valueWidth: 125,
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,
                     onTap: () async {
@@ -100,6 +101,7 @@ class _AddAccountState extends State<AddAccount> {
                     ),
                     title: "Current balance",
                     value: accountBalance.toString(),
+                    valueWidth: 125,
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,
                     onTap: () async{
@@ -119,6 +121,7 @@ class _AddAccountState extends State<AddAccount> {
                     ),
                     title: "Currency",
                     value: "IDR",
+                    valueWidth: 150,
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,
                     onTap: () {},
@@ -133,6 +136,7 @@ class _AddAccountState extends State<AddAccount> {
                     ),
                     title: "Type",
                     value: "Cash",
+                    valueWidth: 165,
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,
                     onTap: () {},

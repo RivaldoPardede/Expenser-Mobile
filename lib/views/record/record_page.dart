@@ -229,6 +229,7 @@ class _RecordPageState extends State<RecordPage> {
                         ),
                         title: 'Account',
                         value: account,
+                        valueWidth: 165,
                         needCircleAvatar: true,
                         onTap: () async{
                           final selectedAccount = await _showBottomModal(context, const ChangeAccount());
@@ -256,6 +257,7 @@ class _RecordPageState extends State<RecordPage> {
                             ),
                         title: 'Category',
                         value: category.isEmpty ? 'Required' : category,
+                        valueWidth: 165,
                         needCircleAvatar: category.isEmpty ? true : false,
                         onTap: () async {
                           final selectedCategory = await _showBottomModal(context, const ChangeCategory());
@@ -275,6 +277,7 @@ class _RecordPageState extends State<RecordPage> {
                         ),
                         title: 'Date',
                         value: getFormattedTime(),
+                        valueWidth: 165,
                         needCircleAvatar: true,
                         onTap: () {},
                       ),
@@ -302,6 +305,7 @@ class _RecordPageState extends State<RecordPage> {
                         ),
                         title: 'Payment Type',
                         value: paymentType,
+                        valueWidth: 130,
                         needCircleAvatar: true,
                         onTap: () async {
                           final selectedPayment = await _showBottomModal(context, ChangePaymentType(paymentType: paymentType,));
@@ -321,6 +325,7 @@ class _RecordPageState extends State<RecordPage> {
                         ),
                         title: 'Payee',
                         value: payee,
+                        valueWidth: 165,
                         needCircleAvatar: true,
                         onTap: () async {
                           final payeeName = await _showBottomModal(context, ChangePayee(payee: payee,));
@@ -340,6 +345,7 @@ class _RecordPageState extends State<RecordPage> {
                         ),
                         title: 'Add Location',
                         value: location,
+                        valueWidth: 130,
                         needCircleAvatar: true,
                         onTap: () async {
                           final Location = await _showBottomModal(context, ChangeLocation(location: location,));
@@ -361,6 +367,7 @@ class _RecordPageState extends State<RecordPage> {
                         ),
                         title: 'Note',
                         value: note,
+                        valueWidth: 165,
                         needCircleAvatar: true,
                         onTap: () async {
                           final notes = await _showBottomModal(context, ChangeNote(note: note,));
