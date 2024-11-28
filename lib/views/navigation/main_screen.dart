@@ -42,6 +42,7 @@ class _MainScreenState extends State<MainScreen> {
         return true;
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: IndexedStack(
           index: selectedTab,
           children: items.map((e) {

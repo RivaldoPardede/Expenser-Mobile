@@ -74,7 +74,7 @@ class _RecordPageState extends State<RecordPage> {
   }
 
   Future<void> _saveRecord(BuildContext modalContext) async {
-    int? amount = int.tryParse(amountController.text.replaceAll('-', '').replaceAll('+', ''));
+    double? amount = double.tryParse(amountController.text.replaceAll('-', '').replaceAll('+', ''));
     final recordData = {
       "transactionType" : transactionType,
       "amount" : amount,
@@ -190,16 +190,16 @@ class _RecordPageState extends State<RecordPage> {
                 isLoading
                   ? Row(
                     children: [
-                      SizedBox(height: 100, width: 18,),
+                      const SizedBox(height: 100, width: 18,),
                       Container(
                         height: 35,
-                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 25),
                         decoration: BoxDecoration(
                           color: blackPrimary,
                           borderRadius: BorderRadius.circular(56),
                         ),
                         child: SizedBox(
-                          width: 28,
+                          width: 22,
                           height: 30,
                           child: CircularProgressIndicator(color: blue,),
                         ),
@@ -320,7 +320,7 @@ class _RecordPageState extends State<RecordPage> {
                           color: Colors.grey[600],
                         ),
                         title: 'Payee',
-                        value: payee.length > 18 ? "${payee.substring(0, 18)}..." : payee,
+                        value: payee,
                         needCircleAvatar: true,
                         onTap: () async {
                           final payeeName = await _showBottomModal(context, ChangePayee(payee: payee,));
@@ -339,7 +339,7 @@ class _RecordPageState extends State<RecordPage> {
                           color: Colors.grey[600],
                         ),
                         title: 'Add Location',
-                        value: location.length > 14 ? "${location.substring(0, 14)}..." : location,
+                        value: location,
                         needCircleAvatar: true,
                         onTap: () async {
                           final Location = await _showBottomModal(context, ChangeLocation(location: location,));
@@ -360,7 +360,7 @@ class _RecordPageState extends State<RecordPage> {
                           fit: BoxFit.contain,
                         ),
                         title: 'Note',
-                        value: note.length > 20 ? "${note.substring(0, 20)}..." : note,
+                        value: note,
                         needCircleAvatar: true,
                         onTap: () async {
                           final notes = await _showBottomModal(context, ChangeNote(note: note,));
