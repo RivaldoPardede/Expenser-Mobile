@@ -4,6 +4,7 @@ import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/common/custom_list_tile_divider.dart';
 import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/home/add_account_name.dart';
+import 'package:final_project/views/home/add_account_type.dart';
 import 'package:final_project/views/home/add_balance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,6 +23,7 @@ class _AddAccountState extends State<AddAccount> {
 
   String accountName = "";
   double accountBalance = 0.00;
+  String accountType = "Cash";
   String? userCurrencyCode;
 
   void fetchCurrencyCode() async {
@@ -159,11 +161,18 @@ class _AddAccountState extends State<AddAccount> {
                       fit: BoxFit.contain,
                     ),
                     title: "Type",
-                    value: "Cash",
+                    value: accountType,
                     valueWidth: 165,
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,
-                    onTap: () {},
+                    onTap: () async {
+                      final selectedType = await _showBottomModal(context, AddAccountType(accountType: accountType,));
+                      if(selectedType != null) {
+                        setState(() {
+                          accountType = selectedType;
+                        });
+                      }
+                    },
                   ),
                   const SizedBox(height: 14,),
                 ],
