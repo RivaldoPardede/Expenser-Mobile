@@ -74,4 +74,13 @@ class Auth {
       return false;
     }
   }
+
+  Future<bool> doesAccountsExist(String userId) async {
+    try {
+      QuerySnapshot accountsSnapshot = await FirebaseFirestore.instance.collection('users').doc(userId).collection("accounts").get();
+      return accountsSnapshot.docs.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:final_project/views/auth/country_selection_page.dart';
 import 'package:final_project/views/navigation/main_screen.dart';
+import 'package:final_project/views/setup/setup_cash_balance.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -36,10 +37,16 @@ class AuthProvider with ChangeNotifier {
       User? user = await _auth.signInWithEmailAndPassword(email, password);
       if (user != null) {
         bool userExists = await _auth.doesUserExist(user.uid);
-        if (userExists) {
+        bool accountsExists = await _auth.doesAccountsExist(user.uid);
+        if (userExists && accountsExists) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        } else if (userExists && !accountsExists) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const SetupCashBalance()),
           );
         } else {
           Navigator.pushReplacement(

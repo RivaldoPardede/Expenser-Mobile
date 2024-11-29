@@ -149,6 +149,8 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
                         child: ElevatedButton(
                           style: buttonPrimary,
                           onPressed: inputValue != null
+                              && double.tryParse(inputValue!.replaceAll(",", "")) != null
+                              && double.tryParse(inputValue!.replaceAll(",", ""))! >= 0
                               ? () async {
                             await saveAccount();
                             Navigator.pushReplacement(
