@@ -1,11 +1,14 @@
+import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/styles/color.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/common/custom_list_tile_divider.dart';
 import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/home/add_account_name.dart';
+import 'package:final_project/views/home/add_account_type.dart';
 import 'package:final_project/views/home/add_balance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 import '../common/modal_subheader.dart';
 
@@ -17,8 +20,87 @@ class AddAccount extends StatefulWidget {
 }
 
 class _AddAccountState extends State<AddAccount> {
+  final FirestoreService _firestoreService = FirestoreService();
+
   String accountName = "";
   double accountBalance = 0.00;
+  String accountType = "Cash";
+  String? userCurrencyCode;
+
+  void fetchCurrencyCode() async {
+    try {
+      String? currencyCode = await _firestoreService.getCurrencyCodeForUser();
+      if (currencyCode != null) {
+        setState(() {
+          userCurrencyCode = currencyCode;
+        });
+      } else {
+        print("Currency code not found for the user.");
+      }
+    } catch (e) {
+      print("Error fetching currency code: $e");
+    }
+  }
+
+  Future<void> _saveAccount(BuildContext modalContext) async {
+    try {
+      List<String> accountNames = await _firestoreService.getAccountIds();
+
+      if (accountNames.contains(accountName)) {
+        ScaffoldMessenger.of(modalContext).showSnackBar(
+          const SnackBar(
+            content: Text("Account Name already exists"),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+    } catch (e) {
+      print('Error fetching account IDs: $e');
+      ScaffoldMessenger.of(modalContext).showSnackBar(
+        const SnackBar(
+          content: Text("Error checking account ID. Please try again."),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (accountName.isEmpty) {
+      ScaffoldMessenger.of(modalContext).showSnackBar(
+        const SnackBar(
+          content: Text("Account Name must not be Empty"),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else if (accountBalance == 0.00){
+      ScaffoldMessenger.of(modalContext).showSnackBar(
+        const SnackBar(
+          content: Text("Account Balance must not be 0.0"),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      try {
+        final accountData = {
+          "account_name": accountName,
+          "current_balance": accountBalance,
+          "currency_code": userCurrencyCode,
+          "type": accountType,
+        };
+
+        await _firestoreService.addAccount(accountData["account_name"].toString(), accountData);
+        Navigator.pop(modalContext);
+
+        ScaffoldMessenger.of(modalContext).showSnackBar(
+          const SnackBar(content: Text("Account saved successfully"),
+            behavior: SnackBarBehavior.floating,),
+        );
+      } catch (e) {
+        print("Error saving account: $e");
+      }
+    }
+  }
 
   Future<String?> _showBottomModal(BuildContext context, Widget destination) {
     return showModalBottomSheet<String>(
@@ -30,6 +112,11 @@ class _AddAccountState extends State<AddAccount> {
       ),
       builder: (context) => destination,
     );
+  }
+
+  void initState() {
+    super.initState();
+    fetchCurrencyCode();
   }
 
   @override
@@ -54,7 +141,8 @@ class _AddAccountState extends State<AddAccount> {
                 Navigator.pop(context);
               },
               onAdd: () {
-                Navigator.pop(context);
+                // Navigator.pop(context);
+                _saveAccount(context);
               },
             ),
             const SizedBox(height: 35,),
@@ -75,10 +163,11 @@ class _AddAccountState extends State<AddAccount> {
                       height: 25,
                       fit: BoxFit.contain,
                     ),
-                    title: "Account name",
+                    title: "Account Name",
                     value: accountName.isEmpty
                         ? "Required"
                         : accountName,
+                    valueWidth: 125,
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,
                     onTap: () async {
@@ -98,8 +187,9 @@ class _AddAccountState extends State<AddAccount> {
                       height: 25,
                       fit: BoxFit.contain,
                     ),
-                    title: "Current balance",
-                    value: accountBalance.toString(),
+                    title: "Current Balance",
+                    value: NumberFormat.decimalPattern().format(accountBalance).toString(),
+                    valueWidth: 125,
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,
                     onTap: () async{
@@ -118,9 +208,9 @@ class _AddAccountState extends State<AddAccount> {
                       fit: BoxFit.contain,
                     ),
                     title: "Currency",
-                    value: "IDR",
+                    value: userCurrencyCode ?? "",
+                    valueWidth: 150,
                     needCircleAvatar: true,
-                    trailingIcon: Icons.chevron_right,
                     onTap: () {},
                   ),
                   const CustomListTileDivider(),
@@ -132,10 +222,18 @@ class _AddAccountState extends State<AddAccount> {
                       fit: BoxFit.contain,
                     ),
                     title: "Type",
-                    value: "Cash",
+                    value: accountType,
+                    valueWidth: 165,
                     needCircleAvatar: true,
                     trailingIcon: Icons.chevron_right,
-                    onTap: () {},
+                    onTap: () async {
+                      final selectedType = await _showBottomModal(context, AddAccountType(accountType: accountType,));
+                      if(selectedType != null) {
+                        setState(() {
+                          accountType = selectedType;
+                        });
+                      }
+                    },
                   ),
                   const SizedBox(height: 14,),
                 ],

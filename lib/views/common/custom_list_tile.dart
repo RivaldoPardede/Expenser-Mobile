@@ -5,6 +5,7 @@ class CustomListTile extends StatefulWidget {
   final Widget icon;
   final String title;
   final String value;
+  final double valueWidth;
   final bool needCircleAvatar;
   final VoidCallback onTap;
   final IconData? trailingIcon;
@@ -14,6 +15,7 @@ class CustomListTile extends StatefulWidget {
     required this.icon,
     required this.title,
     required this.value,
+    required this.valueWidth,
     required this.needCircleAvatar,
     required this.onTap,
     this.trailingIcon,
@@ -78,7 +80,7 @@ class _CustomListTileState extends State<CustomListTile> {
             Row(
               children: [
                 Container(
-                  width: 130,
+                  width: widget.valueWidth,
                   child: Text(
                     widget.value,
                     maxLines: 1,
