@@ -73,10 +73,10 @@ class _AddAccountState extends State<AddAccount> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-    } else if (accountBalance == 0.00){
+    } else if (accountBalance < 0.00){
       ScaffoldMessenger.of(modalContext).showSnackBar(
         const SnackBar(
-          content: Text("Account Balance must not be 0.0"),
+          content: Text("Account Balance must not be below 0.0"),
           behavior: SnackBarBehavior.floating,
         ),
       );
