@@ -1,6 +1,8 @@
+import 'package:final_project/views/settings/security_pass.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'language_dialog.dart'; // Pastikan file LanguageDialog sudah ada
+import 'logout_popup.dart';
 import 'record_page.dart'; // Pastikan file RecordPage sudah ada
 
 class Settings extends StatelessWidget {
@@ -176,6 +178,13 @@ class MyProfilePage extends StatelessWidget {
                           height: 30,
                         ),
                         title: 'Security & Password',
+                        onTap: () {
+                          // Navigasi ke halaman RecordPage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SecurityPass()),
+                          );
+                        },
                       ),
                       const Divider(),
                       buildSettingsOption(
@@ -186,6 +195,9 @@ class MyProfilePage extends StatelessWidget {
                           height: 30,
                         ),
                         title: 'Logout',
+                        onTap: () {
+                          showLogOut(context);
+                        }
                       ),
                     ],
                   ),
