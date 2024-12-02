@@ -6,7 +6,7 @@ import 'package:final_project/views/auth/widgets/auth_button.dart';
 import 'package:final_project/views/auth/widgets/input_field.dart';
 import 'package:final_project/views/common/custom_header.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class SigninPage extends StatefulWidget {
@@ -31,9 +31,13 @@ class _SigninPageState extends State<SigninPage> {
 
   void _validateForm() {
     setState(() {
-      isFormValid = _emailController.text.isNotEmpty &&
-          _passwordController.text.isNotEmpty;
+      isFormValid = _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty && _isEmailValid();
     });
+  }
+
+  bool _isEmailValid() {
+    String email = _emailController.text.trim();
+    return email.contains('@') && email.contains('.');
   }
 
   @override
@@ -81,11 +85,12 @@ class _SigninPageState extends State<SigninPage> {
                 ),
                 const SizedBox(height: 40),
                 AuthButton(
-                    text: 'Continue With Google',
-                    iconPath: 'images/Google.svg',
-                    onPressed: () async{
-                      await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle(context);
-                    }),
+                  text: 'Continue With Google',
+                  iconPath: 'images/Google.svg',
+                  onPressed: () async {
+                    await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle(context);
+                  },
+                ),
                 const SizedBox(height: 60),
               ],
             ),
@@ -114,7 +119,8 @@ class _SigninPageState extends State<SigninPage> {
                         setState(() {
                           isLoading = false;
                         });
-                      }: null,
+                      }
+                          : null,
                       child: isLoading
                           ? const SizedBox(
                         height: 20,
@@ -123,7 +129,8 @@ class _SigninPageState extends State<SigninPage> {
                           color: Colors.white,
                           strokeWidth: 2.0,
                         ),
-                      ) : const Text('Sign In'),
+                      )
+                          : const Text('Sign In'),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -158,7 +165,7 @@ class _SigninPageState extends State<SigninPage> {
                 ],
               ),
             ),
-            ),
+          ),
         ],
       ),
     );

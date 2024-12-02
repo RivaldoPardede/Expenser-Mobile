@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:final_project/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
+import 'views/auth/signin_page.dart'; // Pastikan ini diimport
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Inisialisasi Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -22,6 +24,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -30,7 +33,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Inter',
       ),
-      home: const OnboardingScreen(),
+      initialRoute: '/', // Halaman awal yang akan ditampilkan
+      routes: {
+        '/': (context) => const OnboardingScreen(), // Rute ke OnboardingScreen
+        '/signin_page': (context) => const SigninPage(), // Rute ke SignInPage
+      },
     );
   }
 }
