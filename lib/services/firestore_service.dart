@@ -102,4 +102,27 @@ class FirestoreService {
       'accountReference': accountRef,
     });
   }
+
+  Future<String?> getCurrentUserId() async {
+    final user = _auth.currentUser;
+    return user?.uid;
+  }
+
+  Stream<List<Map<String, dynamic>>> getAccountsStream(String userId) {
+    try {
+      return _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('accounts')
+          .snapshots()
+          .map((querySnapshot) {
+        return querySnapshot.docs.map((doc) {
+          return doc.data();
+        }).toList();
+      });
+    } catch (e) {
+      throw Exception('Failed to fetch accounts: $e');
+    }
+  }
 }
+  

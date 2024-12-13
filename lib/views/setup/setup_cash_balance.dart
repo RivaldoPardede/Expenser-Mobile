@@ -3,6 +3,7 @@ import 'package:final_project/styles/button.dart';
 import 'package:final_project/views/common/custom_image_header.dart';
 import 'package:final_project/views/onBoarding/onboarding_screen.dart';
 import 'package:final_project/views/setup/turn_on_notification.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:currency_textfield/currency_textfield.dart';
 
@@ -54,6 +55,7 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
   }
 
   Future<void> saveAccount() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
     if (inputValue == null || userCurrencyCode == null) {
       print("Incomplete data to save the account.");
       return;
@@ -61,6 +63,7 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
 
     try {
       final accountData = {
+        "userId": userId,
         "account_name": "main",
         "current_balance": double.tryParse(inputValue!.replaceAll(",", "")),
         "currency_code": userCurrencyCode,

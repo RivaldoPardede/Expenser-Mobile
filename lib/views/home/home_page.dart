@@ -4,6 +4,7 @@ import 'package:final_project/views/home/widgets/last_records_card.dart';
 import 'package:final_project/views/home/widgets/top_expense_card.dart';
 import 'package:final_project/views/home/widgets/total_balance_card.dart';
 import 'package:flutter/material.dart';
+import 'package:final_project/services/firestore_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
+  final FirestoreService firestoreService = FirestoreService();
   String? selectedValue = 'Week1';
 
   @override
@@ -27,21 +28,62 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
-                  children: [
-                    Expanded(
-                      child: TotalBalanceCard(
-                          svgPath: 'images/home/total_balance.svg',
-                          accountName: 'Main',
-                          totalBalance: 1000000
-                      )
-                    ),
-                    SizedBox(width: 18),
-                    Expanded(
-                      child: AddAccountCard()
-                    ),
-                  ],
+                FutureBuilder<String?>(
+                  future: firestoreService.getCurrentUserId(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData || snapshot.data == null) {
+                      return const Center(child: Text('User not logged in.'));
+                    }
+
+                    final userId = snapshot.data!;
+
+                    return StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: firestoreService.getAccountsStream(userId),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return const Center(child: Text('No accounts found.'));
+                        }
+
+                        final accounts = snapshot.data!;
+
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 150,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: accounts.length,
+                                  itemBuilder: (context, index) {
+                                    final reversedIndex = accounts.length - 1 - index;
+                                    final account = accounts[reversedIndex];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 18),
+                                      child: TotalBalanceCard(
+                                        svgPath: 'images/home/total_balance.svg',
+                                        accountName: account['account_name'] ?? 'Unknown',
+                                        totalBalance: (account['current_balance'] as num?)?.toDouble() ?? 0.0,
+                                        currencyCode: account['currency_code'] ?? 'USD',
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            const Expanded(child: AddAccountCard()),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 ),
+
                 const SizedBox(height: 16),
                 const ExpenseGraph(type: ExpenseType.daily),
 
@@ -63,16 +105,17 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Top Expenses', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const Text(
+                        'Top Expenses',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
                       Divider(
                         color: Colors.black.withOpacity(0.2),
                         thickness: 0.5,
-                        indent: 0,
-                        endIndent: 0,
                       ),
                       const Text('THIS MONTH', style: TextStyle(color: Colors.grey, fontSize: 12)),
                       const SizedBox(height: 16),
-                      TopExpenseCard()
+                      TopExpenseCard(),
                     ],
                   ),
                 ),
@@ -95,19 +138,19 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Last Records', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const Text(
+                        'Last Records',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
                       Divider(
                         color: Colors.black.withOpacity(0.2),
                         thickness: 0.5,
-                        indent: 0,
-                        endIndent: 0,
                       ),
                       const Text('THIS MONTH', style: TextStyle(color: Colors.grey, fontSize: 12)),
                       LastRecordsCard(),
                     ],
                   ),
                 ),
-                const SizedBox(height: 80),
               ],
             ),
           ),
