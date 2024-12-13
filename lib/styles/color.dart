@@ -8,3 +8,5 @@ Color white = const Color(0xffFFFFFF);
 Color yellow = const Color(0xfffedf00);
 Color darkGrey = const Color(0xff4A4A4A);
 Color lightGrey = const Color(0xffEBEBEB);
+Color red = const Color(0xffE41111);
+Color green = const Color(0xff3FE411);

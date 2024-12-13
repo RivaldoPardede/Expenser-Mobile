@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'record_popup.dart'; // Import fungsi dialog pop-up
+import 'record_popup.dart';
 
 class RecordPage extends StatelessWidget {
   const RecordPage({Key? key}) : super(key: key);
@@ -67,6 +67,7 @@ class RecordPage extends StatelessWidget {
         style: TextStyle(
           color: icon == Icons.arrow_upward ? Colors.red : Colors.green,
           fontWeight: FontWeight.bold,
+          fontSize: 14,
         ),
       ),
     );
