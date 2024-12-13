@@ -148,5 +148,51 @@ class FirestoreService {
       throw Exception('Failed to fetch accounts: $e');
     }
   }
+
+  Stream<Map<String, List<Map<String, dynamic>>>> getUserTransactionsGroupedByDate() {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      throw Exception("User not logged in");
+    }
+
+    return _firestore.collection('users').doc(userId).collection('accounts').snapshots().asyncExpand((accountsSnapshot) {
+      final accountReferences = accountsSnapshot.docs.map((doc) => doc.reference).toList();
+      if (accountReferences.isEmpty) {
+        return Stream.value({}); // No accounts, return an empty map
+      }
+
+      return _firestore
+          .collection('transactions')
+          .where('accountReference', whereIn: accountReferences)
+          .orderBy('date', descending: true)
+          .snapshots()
+          .map((querySnapshot) {
+        final transactions = <String, List<Map<String, dynamic>>>{};
+
+        for (var doc in querySnapshot.docs) {
+          final data = doc.data();
+
+          final timestamp = data['date'] as Timestamp;
+          final date = timestamp.toDate();
+          final dateString = "${date.year}-${date.month}-${date.day}";
+
+          final transaction = {
+            'category': data['category'],
+            'paymentType': data['paymentType'],
+            'transactionType': data['transactionType'],
+            'date': date,
+            'amount': data['amount'],
+          };
+
+          transactions[dateString] ??= [];
+          transactions[dateString]!.add(transaction);
+        }
+
+        return transactions;
+      });
+    });
+  }
+
+
 }
   

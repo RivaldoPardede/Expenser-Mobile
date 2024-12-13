@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project/styles/button.dart';
 import 'package:final_project/views/onBoarding/onboarding_screen.dart';
 import 'package:final_project/views/common/custom_header.dart';
