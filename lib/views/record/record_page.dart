@@ -106,6 +106,9 @@ class _RecordPageState extends State<RecordPage> {
     } else{
       try {
         await _firestoreService.addTransaction(recordData["account"].toString(), recordData);
+        String accountRef = recordData["account"].toString();
+        double balanceChange = transactionType == "Income" ? amount! : -amount!;
+        await _firestoreService.updateAccountBalance(accountRef, balanceChange);
         Navigator.pop(modalContext);
 
         ScaffoldMessenger.of(modalContext).showSnackBar(

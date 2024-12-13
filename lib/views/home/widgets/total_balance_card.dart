@@ -20,7 +20,7 @@ class TotalBalanceCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16.0),
       height: 150.0,
-      width: 180.0, // Adjust card width for horizontal scrolling
+      width: 180.0,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -44,7 +44,7 @@ class TotalBalanceCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '$currencyCode ${totalBalance.toStringAsFixed(2)}', // Format balance to two decimal places
+            '$currencyCode ${totalBalance.toStringAsFixed(2)}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
