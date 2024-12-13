@@ -96,10 +96,34 @@ class FirestoreService {
         .collection('accounts')
         .doc(accountId);
 
-    // Add a new document with a generated ID
     await recordRef.add({
       ...recordData,
       'accountReference': accountRef,
+    });
+  }
+
+  Future<void> updateAccountBalance(String accountReference, double balanceChange) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final accountRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('accounts')
+        .doc(accountReference);
+
+    print('Updating account balance for reference: $accountReference');
+
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(accountRef);
+
+      if (!snapshot.exists) {
+        throw Exception("Account not found");
+      }
+
+      final data = snapshot.data() as Map<String, dynamic>;
+      double currentBalance = (data['current_balance'] ?? 0.0) as double;
+      double updatedBalance = currentBalance + balanceChange;
+
+      transaction.update(accountRef, {'current_balance': updatedBalance});
     });
   }
 
