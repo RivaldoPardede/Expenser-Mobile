@@ -16,6 +16,7 @@ import 'package:final_project/views/record/change_payment_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class RecordPage extends StatefulWidget {
   const RecordPage({super.key});
@@ -36,6 +37,13 @@ class _RecordPageState extends State<RecordPage> {
   String? userCurrencyCode;
   bool isLoading = true;
   List<String> accountIds = [];
+  DateTime? selectedDate;
+
+  void _onDateSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+    setState(() {
+      selectedDate = args.value;
+    });
+  }
 
   void fetchAccountIds() async {
     try {
@@ -80,7 +88,7 @@ class _RecordPageState extends State<RecordPage> {
       "amount" : amount,
       "account" : account,
       "category" : category,
-      "date" : DateTime.now(),
+      "date": selectedDate ?? DateTime.now(),
       "paymentType" : paymentType,
       "payee" : payee,
       "location" : location,
@@ -144,7 +152,40 @@ class _RecordPageState extends State<RecordPage> {
   void initState() {
     super.initState();
     fetchAccountIds();
+    selectedDate = DateTime.now();
   }
+
+  void _showDatePickerModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: SfDateRangePicker(
+              view: DateRangePickerView.month,
+              selectionMode: DateRangePickerSelectionMode.single,
+              initialSelectedDate: selectedDate,
+              onSelectionChanged: _onDateSelectionChanged,
+              showActionButtons: true,
+              onCancel: () {
+                Navigator.pop(context);
+              },
+              onSubmit: (selectedDate) {
+                setState(() {
+                  this.selectedDate = selectedDate as DateTime;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -279,10 +320,12 @@ class _RecordPageState extends State<RecordPage> {
                           color: Colors.grey[600],
                         ),
                         title: 'Date',
-                        value: getFormattedTime(),
+                        value: selectedDate != null
+                            ? DateFormat('dd/MM/yyyy').format(selectedDate!)
+                            : "Select a date",
                         valueWidth: 165,
                         needCircleAvatar: true,
-                        onTap: () {},
+                        onTap: _showDatePickerModal,
                       ),
                       const SizedBox(height: 14,),
                     ],
