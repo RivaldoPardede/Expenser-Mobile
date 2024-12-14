@@ -5,6 +5,7 @@ class TopExpenseBarItem extends StatelessWidget {
   final double value;
   final double totalValue;
   final Color color;
+  final String currencyCode;
 
   const TopExpenseBarItem({
     super.key,
@@ -12,6 +13,7 @@ class TopExpenseBarItem extends StatelessWidget {
     required this.value,
     required this.totalValue,
     required this.color,
+    required this.currencyCode,
   });
 
   @override
@@ -29,10 +31,7 @@ class TopExpenseBarItem extends StatelessWidget {
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             Text(
-              'IDR ${value.toStringAsFixed(0).replaceAllMapped(
-                RegExp(r'\B(?=(\d{3})+(?!\d))'),
-                    (match) => ',',
-              )}',
+              '$currencyCode ${value.toStringAsFixed(0)}',
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ],
@@ -42,7 +41,6 @@ class TopExpenseBarItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           child: Container(
             height: 24,
-            width: double.infinity,
             color: Colors.grey.withOpacity(0.2),
             child: Row(
               children: [

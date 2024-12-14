@@ -193,6 +193,66 @@ class FirestoreService {
     });
   }
 
+  Stream<List<Map<String, dynamic>>> getTop3ExpensesThisMonthWithCurrency() {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
 
+    if (userId == null) {
+      throw Exception("User not logged in");
+    }
+
+    // Get current date details (current year and month)
+    final now = DateTime.now();
+    final currentMonth = now.month;
+    final currentYear = now.year;
+
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('accounts')
+        .snapshots()
+        .asyncMap((accountsSnapshot) async {
+      final accountCurrencyMap = <String, String>{};
+
+      // Map account references to their currency_code
+      for (var doc in accountsSnapshot.docs) {
+        accountCurrencyMap[doc.reference.id] = doc.data()['currency_code'];
+      }
+
+      // Fetch transactions where transactionType == 'Expense' and within the current month
+      final querySnapshot = await _firestore
+          .collection('transactions')
+          .where('accountReference', whereIn: accountsSnapshot.docs.map((e) => e.reference).toList())
+          .where('transactionType', isEqualTo: 'Expense')
+          .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(currentYear, currentMonth, 1))) // Start of the current month
+          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(DateTime(currentYear, currentMonth + 1, 0))) // End of the current month
+          .get();
+
+      // Group transactions by category
+      final Map<String, Map<String, dynamic>> groupedExpenses = {};
+
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data();
+        final category = data['category'];
+        final amount = data['amount'] ?? 0.0;
+        final accountRefId = (data['accountReference'] as DocumentReference).id;
+
+        if (!groupedExpenses.containsKey(category)) {
+          groupedExpenses[category] = {
+            'category': category,
+            'amount': 0.0,
+            'currency_code': accountCurrencyMap[accountRefId] ?? '',
+          };
+        }
+
+        groupedExpenses[category]!['amount'] += amount; // Sum up the amounts
+      }
+
+      // Sort by total amount and take top 3
+      final sortedExpenses = groupedExpenses.values.toList()
+        ..sort((a, b) => (b['amount'] as double).compareTo(a['amount'] as double));
+
+      return sortedExpenses.take(3).toList();
+    });
+  }
 }
   

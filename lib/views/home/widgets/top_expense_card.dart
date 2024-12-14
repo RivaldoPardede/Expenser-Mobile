@@ -1,28 +1,64 @@
 import 'package:final_project/views/home/widgets/top_expense_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:final_project/services/firestore_service.dart';
 
 class TopExpenseCard extends StatelessWidget {
-  final List<Map<String, dynamic>> expenseData = [
-    {'title': 'Food', 'amount': 120000.0, 'color': Colors.blue},
-    {'title': 'Transport', 'amount': 80000.0, 'color': Colors.green},
-    {'title': 'Shopping', 'amount': 100000.0, 'color': Colors.red},
+  final FirestoreService _firestoreService = FirestoreService();
+
+  final List<Color> barColors = [
+    Colors.blue,
+    Colors.orange,
+    Colors.green,
+    Colors.purple,
+    Colors.red,
   ];
 
   TopExpenseCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    double total = expenseData.fold(0, (sum, item) => sum + item['amount']);
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: _firestoreService.getTop3ExpensesThisMonthWithCurrency(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No expenses this month'));
+        }
 
-    return Column(
-      children: expenseData.map((expense) {
-        return TopExpenseBarItem(
-          category: expense['title'],
-          value: expense['amount'],
-          totalValue: total,
-          color: expense['color'],
+        final expenseData = snapshot.data!;
+
+        double total = expenseData.fold(0.0, (sum, item) => sum + (item['amount'] ?? 0.0));
+
+        return Column(
+          children: [
+            // "THIS MONTH" label
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                "THIS MONTH",
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ...expenseData.asMap().entries.map((entry) {
+              int index = entry.key;
+              final expense = entry.value;
+
+              return TopExpenseBarItem(
+                category: expense['category'],
+                value: expense['amount'],
+                totalValue: total,
+                color: barColors[index % barColors.length],
+                currencyCode: expense['currency_code'] ?? '',
+              );
+            }).toList(),
+          ],
         );
-      }).toList(),
+      },
     );
   }
 }
+
