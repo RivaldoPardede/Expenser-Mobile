@@ -62,7 +62,6 @@ class TransactionCard extends StatelessWidget {
             ],
           ),
         ),
-        // Trailing amount text
         Text(
           amount,
           style: TextStyle(
