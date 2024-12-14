@@ -33,16 +33,6 @@ class TopExpenseCard extends StatelessWidget {
 
         return Column(
           children: [
-            // "THIS MONTH" label
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                "THIS MONTH",
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
             ...expenseData.asMap().entries.map((entry) {
               int index = entry.key;
               final expense = entry.value;
