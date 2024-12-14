@@ -68,7 +68,6 @@ class _TransactionPageState extends State<TransactionPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Display Date Header
                       Text(
                         date,
                         style: TextStyle(
@@ -77,7 +76,7 @@ class _TransactionPageState extends State<TransactionPage> {
                           color: darkGrey,
                         ),
                       ),
-                      CustomListTileDivider(),
+                      const CustomListTileDivider(),
                       const SizedBox(height: 8),
                       ...dayTransactions.map((transaction) {
                         return Padding(
@@ -92,7 +91,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                 : TransactionType.expense,
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),

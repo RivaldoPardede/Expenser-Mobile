@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LastRecordsItem extends StatelessWidget {
   final String title;
-  final int amount;
+  final String amount;
   final DateTime date;
   final String paymentMethod;
-  final IconData icon;
+  final String icon;
   final Color color;
 
   const LastRecordsItem({
@@ -22,9 +23,10 @@ class LastRecordsItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        CircleAvatar(
-          backgroundColor: color.withOpacity(0.1),
-          child: Icon(icon, color: color, size: 20),
+        SvgPicture.asset(
+          icon,
+          width: 40,
+          height: 40,
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -41,11 +43,11 @@ class LastRecordsItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              'IDR ${amount.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => ".")}',
-              style: const TextStyle(
+              amount,
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.red,
+                color: color,
               ),
             ),
             const SizedBox(height: 4),
