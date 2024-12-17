@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -300,6 +301,86 @@ class FirestoreService {
 
       recentTransactions.sort((a, b) => b['date'].compareTo(a['date']));
       return recentTransactions.take(3).toList();
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> getDailyExpenses(String userId, int year, int month, int week) {
+    final weekStart = DateTime(year, month, (week - 1) * 7 + 1);
+    final weekEnd = DateTime(year, month, (week - 1) * 7 + 7, 23, 59, 59);
+
+    if (kDebugMode) print("Local Week start: ${weekStart.toLocal()}, Week end: ${weekEnd.toLocal()}");
+
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('accounts')
+        .snapshots()
+        .asyncExpand((accountsSnapshot) {
+      final accountRefs = accountsSnapshot.docs.map((doc) => doc.reference).toList();
+
+      if (accountRefs.isEmpty) {
+        return const Stream<List<Map<String, dynamic>>>.empty();
+      }
+
+      return _firestore
+          .collection('transactions')
+          .where('accountReference', whereIn: accountRefs)
+          .where('transactionType', isEqualTo: 'Expense')
+          .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(weekStart))
+          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(weekEnd))
+          .snapshots()
+          .map((querySnapshot) {
+        return querySnapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'date': (data['date'] as Timestamp).toDate().toLocal(),
+            'amount': data['amount'] as double,
+          };
+        }).toList();
+      });
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> getWeeklyExpenses(String userId, int year, int month) {
+    final monthStart = DateTime(year, month, 1);
+    final monthEnd = DateTime(year, month + 1, 0);
+
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('accounts')
+        .snapshots()
+        .asyncExpand((accountsSnapshot) {
+      final accountRefs = accountsSnapshot.docs.map((doc) => doc.reference).toList();
+
+      if (accountRefs.isEmpty) {
+        return const Stream<List<Map<String, dynamic>>>.empty();
+      }
+
+      return _firestore
+          .collection('transactions')
+          .where('accountReference', whereIn: accountRefs)
+          .where('transactionType', isEqualTo: 'Expense')
+          .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(monthStart))
+          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(monthEnd))
+          .snapshots()
+          .map((querySnapshot) {
+        final weeklyExpenses = <int, double>{};
+
+        for (var doc in querySnapshot.docs) {
+          final data = doc.data();
+          final date = (data['date'] as Timestamp).toDate();
+          final weekOfMonth = ((date.day - 1) ~/ 7) + 1;
+
+          weeklyExpenses[weekOfMonth] = (weeklyExpenses[weekOfMonth] ?? 0) + (data['amount'] as double);
+        }
+
+        return weeklyExpenses.entries
+            .map((entry) => {
+          'week': entry.key,
+          'amount': entry.value,
+        }).toList();
+      });
     });
   }
 
