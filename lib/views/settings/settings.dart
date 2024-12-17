@@ -1,27 +1,20 @@
-import 'package:final_project/views/settings/security_pass.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'language_dialog.dart'; // Pastikan file LanguageDialog sudah ada
+import 'package:provider/provider.dart';
+import 'language_dialog.dart';
 import 'logout_popup.dart';
-import 'record_page.dart'; // Pastikan file RecordPage sudah ada
+import 'record_page.dart';
+import 'package:final_project/providers/auth_provider.dart';
+import 'security_pass.dart';
 
 class Settings extends StatelessWidget {
   const Settings({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const MyProfilePage(),
-    );
-  }
-}
+    final userEmail = Provider.of<AuthProvider>(context).userEmail;
+    final username = Provider.of<AuthProvider>(context).username; // Ambil username
 
-class MyProfilePage extends StatelessWidget {
-  const MyProfilePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -45,7 +38,7 @@ class MyProfilePage extends StatelessWidget {
             children: [
               // Profile Information
               Card(
-                elevation: 4, // Tambahkan sedikit elevation untuk efek bayangan
+                elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -56,24 +49,23 @@ class MyProfilePage extends StatelessWidget {
                     children: [
                       const CircleAvatar(
                         radius: 30,
-                        backgroundImage: NetworkImage(
-                            'https://via.placeholder.com/150'), // Ganti dengan URL gambar
+                        backgroundImage: AssetImage('images/profile.png'),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
-                              'Dhea Tania Salsabila',
-                              style: TextStyle(
+                              username ?? 'User', // Gunakan username atau fallback ke 'User'
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              'dheataniassalsabila@gmail.com',
-                              style: TextStyle(
+                              userEmail ?? 'Email not available',
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
                               ),
@@ -81,20 +73,6 @@ class MyProfilePage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Edit Profile',
-                          style: TextStyle(fontSize: 12, color: Colors.white), // Mengubah ukuran teks
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Mengubah warna tombol menjadi biru
-                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Mengatur ukuran tombol
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0), // Menambahkan sudut membulat
-                          ),
-                        ),
-                      )
                     ],
                   ),
                 ),
@@ -113,11 +91,11 @@ class MyProfilePage extends StatelessWidget {
 
               // Card containing all Settings Options
               Card(
-                elevation: 4, // Elevation for the whole settings options card
+                elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                color: Colors.white, // Set the background color to white
+                color: Colors.white,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Column(
@@ -125,64 +103,16 @@ class MyProfilePage extends StatelessWidget {
                       buildSettingsOption(
                         context,
                         icon: SvgPicture.asset(
-                          'images/notification.svg', // Ganti dengan path gambar Anda
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: 'Notification',
-                        trailing: Switch(
-                          value: true,
-                          activeColor: Colors.green,
-                          onChanged: (value) {
-                            print('Notification toggled: $value');
-                          },
-                        ),
-                      ),
-                      const Divider(),
-                      buildSettingsOption(
-                        context,
-                        icon: SvgPicture.asset(
-                          'images/language.svg', // Ganti dengan path gambar Anda
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: 'Language',
-                        onTap: () {
-                          // Tampilkan dialog pemilihan bahasa
-                          LanguageDialog.showLanguageSelection(context);
-                        },
-                      ),
-                      const Divider(),
-                      buildSettingsOption(
-                        context,
-                        icon: SvgPicture.asset(
-                          'images/record.svg', // Ganti dengan path gambar Anda
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: 'Record',
-                        onTap: () {
-                          // Navigasi ke halaman RecordPage
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const RecordPage()),
-                          );
-                        },
-                      ),
-                      const Divider(),
-                      buildSettingsOption(
-                        context,
-                        icon: SvgPicture.asset(
-                          'images/Shield Keyhole.svg', // Ganti dengan path gambar Anda
+                          'images/Shield Keyhole.svg',
                           width: 30,
                           height: 30,
                         ),
                         title: 'Security & Password',
                         onTap: () {
-                          // Navigasi ke halaman RecordPage
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const SecurityPass()),
+                            MaterialPageRoute(
+                                builder: (context) => const SecurityPass()),
                           );
                         },
                       ),
@@ -190,14 +120,14 @@ class MyProfilePage extends StatelessWidget {
                       buildSettingsOption(
                         context,
                         icon: SvgPicture.asset(
-                          'images/logout.svg', // Ganti dengan path gambar Anda
+                          'images/logout.svg',
                           width: 30,
                           height: 30,
                         ),
                         title: 'Logout',
                         onTap: () {
                           showLogOut(context);
-                        }
+                        },
                       ),
                     ],
                   ),
@@ -212,7 +142,7 @@ class MyProfilePage extends StatelessWidget {
 
   Widget buildSettingsOption(
       BuildContext context, {
-        required Widget icon, // Ubah tipe menjadi Widget
+        required Widget icon,
         required String title,
         Widget? trailing,
         VoidCallback? onTap,
@@ -220,9 +150,9 @@ class MyProfilePage extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Padding setiap item
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start, // Mengubah alignment menjadi start (kiri)
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             icon,
             const SizedBox(width: 16),
@@ -230,7 +160,7 @@ class MyProfilePage extends StatelessWidget {
               child: Text(
                 title,
                 style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.left, // Menjadikan teks di kiri
+                textAlign: TextAlign.left,
               ),
             ),
             if (trailing != null) trailing,
@@ -246,3 +176,4 @@ class MyProfilePage extends StatelessWidget {
     );
   }
 }
+

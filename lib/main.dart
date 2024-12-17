@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:final_project/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
-import 'views/auth/signin_page.dart'; // Pastikan ini diimport
+import 'views/auth/signin_page.dart';
+import 'views/settings/settings.dart'; // Pastikan file ini sesuai
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,8 +16,10 @@ void main() async {
   );
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()), // AuthProvider untuk state management
+      ],
       child: const MyApp(),
     ),
   );
@@ -37,6 +40,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const OnboardingScreen(), // Rute ke OnboardingScreen
         '/signin_page': (context) => const SigninPage(), // Rute ke SignInPage
+        '/settings': (context) => const Settings(), // Rute ke Settings/Profile Page
       },
     );
   }

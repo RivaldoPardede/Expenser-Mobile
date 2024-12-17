@@ -1,3 +1,4 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:final_project/providers/auth_provider.dart';
 import 'package:final_project/styles/button.dart';
 import 'package:final_project/styles/color.dart';
@@ -21,12 +22,14 @@ class _SigninPageState extends State<SigninPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool isFormValid = false;
   bool isLoading = false;
+  final _secureStorage = FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
     _emailController.addListener(_validateForm);
     _passwordController.addListener(_validateForm);
+    _loadStoredPassword();
   }
 
   void _validateForm() {
@@ -37,7 +40,18 @@ class _SigninPageState extends State<SigninPage> {
 
   bool _isEmailValid() {
     String email = _emailController.text.trim();
-    return email.contains('@') && email.contains('.');
+    return email.isNotEmpty && email.contains('@') && email.contains('.');
+  }
+
+  Future<void> _loadStoredPassword() async {
+    String? storedPassword = await _secureStorage.read(key: _emailController.text.trim());
+    if (storedPassword != null) {
+      _passwordController.text = storedPassword;
+    }
+  }
+
+  Future<void> _storePassword(String email, String password) async {
+    await _secureStorage.write(key: email, value: password);
   }
 
   @override
@@ -116,6 +130,7 @@ class _SigninPageState extends State<SigninPage> {
                           _emailController.text.trim(),
                           _passwordController.text.trim(),
                         );
+                        await _storePassword(_emailController.text.trim(), _passwordController.text.trim());
                         setState(() {
                           isLoading = false;
                         });

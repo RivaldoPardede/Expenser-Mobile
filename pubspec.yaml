@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  fluttertoast: ^8.0.10
+  flutter_secure_storage: ^8.0.0
 
   fl_chart: ^0.64.0
   device_preview: 1.2.0

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   runApp(const ChangePass());
@@ -35,7 +36,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool get _isFormValid {
     return _currentPasswordController.text.isNotEmpty &&
         _newPasswordController.text.isNotEmpty &&
-        _retypePasswordController.text.isNotEmpty;
+        _retypePasswordController.text.isNotEmpty &&
+        _newPasswordController.text == _retypePasswordController.text;
   }
 
   @override
@@ -65,7 +67,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             ),
             const SizedBox(height: 10),
             const Text(
-              "Which part of country that you call home?",
+              "Please fill out all fields to change your password.",
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -116,11 +118,29 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
                 onPressed: _isFormValid
-                    ? () {
-                  // Handle Save action
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Password Saved')),
+                    ? () async {
+                  bool passwordChanged = await _changePassword(
+                    _currentPasswordController.text.trim(),
+                    _newPasswordController.text.trim(),
                   );
+                  if (passwordChanged) {
+                    // Show toast using Fluttertoast
+                    Fluttertoast.showToast(
+                        msg: "Password berhasil diubah",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.blue,
+                        textColor: Colors.white,
+                        fontSize: 16.0
+                    );
+                    // Setelah toast berhasil, navigasi kembali
+                    Navigator.pop(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Failed to Change Password')),
+                    );
+                  }
                 }
                     : null,
                 child: Text(
@@ -144,9 +164,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       String label, TextEditingController controller, bool isVisible, VoidCallback toggleVisibility) {
     return TextField(
       controller: controller,
-      onChanged: (value) {
-        setState(() {});
-      },
       obscureText: !isVisible,
       decoration: InputDecoration(
         labelText: label,
@@ -170,5 +187,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         ),
       ),
     );
+  }
+
+  Future<bool> _changePassword(String currentPassword, String newPassword) async {
+    try {
+      // Simulate a password change operation
+      print('Current Password: $currentPassword');
+      print('New Password: $newPassword');
+      // Implement your actual password change logic here
+      await Future.delayed(Duration(seconds: 1));  // Simulasi delay
+      return true;  // Berhasil mengubah password
+    } catch (e) {
+      print('Error changing password: $e');
+      return false;  // Gagal mengubah password
+    }
   }
 }
