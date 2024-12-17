@@ -384,5 +384,24 @@ class FirestoreService {
     });
   }
 
+  Stream<List<Map<String, dynamic>>> getSavingsAccountsStream() {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('accounts')
+        .where('type', isEqualTo: 'Savings') // Filter hanya akun bertipe "Savings"
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          "id": doc.id,
+          "current_balance": data['current_balance'] ?? 0.0, // Pastikan mengambil balance
+          "type": data['type'] ?? '',
+        };
+      }).toList();
+    });
+  }
 }
   
