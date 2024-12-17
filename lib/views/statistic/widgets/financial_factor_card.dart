@@ -11,12 +11,12 @@ class financialFactorCard extends StatefulWidget {
 
 class _financialFactorCardState extends State<financialFactorCard> {
   final FirestoreService firestoreService = FirestoreService();
-  double incomePercentage = 0.0;
-
+  double totalIncome = 0.0;
+  double totalExpenses = 0.0;
 
   double calculateIncomePercentage(Map<String, List<Map<String, dynamic>>> transactionsByDate) {
-    double totalIncome = 0.0;
-    double totalExpenses = 0.0;
+    totalIncome = 0.0;
+    totalExpenses = 0.0;
 
     transactionsByDate.forEach((date, transactions) {
       for (var transaction in transactions) {
@@ -33,6 +33,15 @@ class _financialFactorCardState extends State<financialFactorCard> {
 
     if (totalIncome > 0) {
       final percentage = ((totalIncome - totalExpenses) / totalIncome) * 100;
+      return percentage < 0 ? 0.0 : percentage;
+    } else {
+      return 0.0;
+    }
+  }
+
+  double calculateExpensePercentage() {
+    if (totalIncome > 0) {
+      final percentage = (100 - (totalExpenses / (0.7 *totalIncome)) * 100);
       return percentage < 0 ? 0.0 : percentage;
     } else {
       return 0.0;
@@ -56,15 +65,16 @@ class _financialFactorCardState extends State<financialFactorCard> {
     return StreamBuilder<Map<String, List<Map<String, dynamic>>>>(
       stream: firestoreService.getUserTransactionsGroupedByDate(),
       builder: (context, snapshot) {
-        double incomePercentage = 0.0;
+        double incomePercentage = 0.0, expensePercentage = 0.0;
 
         if (snapshot.hasData) {
           incomePercentage = calculateIncomePercentage(snapshot.data!);
+          expensePercentage = calculateExpensePercentage();
         }
 
         final factors = [
           {"label": "Savings", "percentage": "30%", "status": "Overall good", "color": Colors.yellow},
-          {"label": "Expenses", "percentage": "20%", "status": "Enough", "color": Colors.yellow},
+          {"label": "Expenses", "percentage": "${expensePercentage.toStringAsFixed(2)}%", "status": getStatusAndColor(expensePercentage)["status"], "color": getStatusAndColor(expensePercentage)["color"]},
           {"label": "Investments", "percentage": "35%", "status": "So Good", "color": Colors.blue},
           {"label": "Income", "percentage": "${incomePercentage.toStringAsFixed(2)}%", "status": getStatusAndColor(incomePercentage)["status"], "color": getStatusAndColor(incomePercentage)["color"]},
         ];
