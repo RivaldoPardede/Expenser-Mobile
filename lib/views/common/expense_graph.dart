@@ -1,3 +1,4 @@
+import 'package:final_project/services/firestore_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -5,6 +6,7 @@ enum ExpenseType { daily, weekly }
 
 class ExpenseGraph extends StatefulWidget {
   final ExpenseType type;
+
   const ExpenseGraph({super.key, required this.type});
 
   @override
@@ -14,11 +16,13 @@ class ExpenseGraph extends StatefulWidget {
 class _ExpenseGraphState extends State<ExpenseGraph> {
   late String selectedValue;
   late List<String> dropdownOptions;
+  late Stream<List<Map<String, dynamic>>> expenseStream;
 
   @override
   void initState() {
     super.initState();
     _updateDropdownOptions();
+    _updateExpenseStream();
   }
 
   @override
@@ -26,30 +30,56 @@ class _ExpenseGraphState extends State<ExpenseGraph> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.type != widget.type) {
       _updateDropdownOptions();
+      _updateExpenseStream();
     }
+  }
+
+  List<Map<String, int>> calculateWeeksInMonth(int year, int month) {
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    List<Map<String, int>> weeks = [];
+
+    int startDay = 1;
+    while (startDay <= daysInMonth) {
+      int endDay = (startDay + 6).clamp(startDay, daysInMonth);
+      weeks.add({'start': startDay, 'end': endDay});
+      startDay = endDay + 1;
+    }
+
+    return weeks;
   }
 
   void _updateDropdownOptions() {
     if (widget.type == ExpenseType.daily) {
-      dropdownOptions = ['Week1', 'Week2', 'Week3', 'Week4'];
+      final now = DateTime.now();
+      final weeks = calculateWeeksInMonth(now.year, now.month);
+      dropdownOptions = List.generate(weeks.length, (index) => 'Week ${index + 1}');
     } else {
       dropdownOptions = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
       ];
     }
     selectedValue = dropdownOptions.first;
-    setState(() {});
+  }
+
+  Future<void> _updateExpenseStream() async {
+    final userId = await FirestoreService().getCurrentUserId();
+    if (userId == null) return;
+
+    final year = DateTime.now().year;
+
+    if (widget.type == ExpenseType.daily) {
+      final week = dropdownOptions.indexOf(selectedValue) + 1;
+      final month = DateTime.now().month;
+      setState(() {
+        expenseStream = FirestoreService().getDailyExpenses(userId, year, month, week);
+      });
+    } else {
+      final selectedMonth = dropdownOptions.indexOf(selectedValue) + 1;
+      setState(() {
+        expenseStream = FirestoreService().getWeeklyExpenses(userId, year, selectedMonth);
+      });
+    }
   }
 
   @override
@@ -72,126 +102,135 @@ class _ExpenseGraphState extends State<ExpenseGraph> {
           ),
         ],
       ),
-      child: Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Expense',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            DropdownButton<String>(
-              value: selectedValue,
-              items: dropdownOptions
-                  .map((option) => DropdownMenuItem(
-                value: option,
-                child: Text(option),
-              ))
-                  .toList(),
-              onChanged: (String? value) {
-                setState(() {
-                  selectedValue = value!;
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Expense',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              DropdownButton<String>(
+                value: selectedValue,
+                items: dropdownOptions
+                    .map(
+                      (option) => DropdownMenuItem(
+                    value: option,
+                    child: Text(option),
+                  ),
+                )
+                    .toList(),
+                onChanged: (String? value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedValue = value;
+                      _updateExpenseStream();
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Container(
+            height: 220,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: expenseStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Center(child: Text('An error occurred. Please try again later.'));
+                }
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final dataPoints = snapshot.data!;
+                final List<FlSpot> chartSpots = [];
+
+                final now = DateTime.now();
+
+                final weeks = calculateWeeksInMonth(now.year, now.month);
+                final weekIndex = dropdownOptions.indexOf(selectedValue);
+                final startDayOfWeek = weeks[weekIndex]['start']!;
+                final endDayOfWeek = weeks[weekIndex]['end']!;
+
+                final Map<int, double> defaultPoints = {
+                  for (int i = startDayOfWeek; i <= endDayOfWeek; i++) i: 0.0,
+                };
+
+                for (var e in dataPoints) {
+                  final dayOfMonth = (e['date'] as DateTime).day;
+                  defaultPoints[dayOfMonth] = (defaultPoints[dayOfMonth] ?? 0) + (e['amount'] as double);
+                }
+
+                defaultPoints.forEach((key, value) {
+                  chartSpots.add(FlSpot(key.toDouble(), value));
                 });
+
+                final maxY = defaultPoints.values.isNotEmpty
+                    ? defaultPoints.values.reduce((a, b) => a > b ? a : b)
+                    : 10.0;
+
+                return LineChart(
+                  LineChartData(
+                    minX: startDayOfWeek.toDouble(),
+                    maxX: endDayOfWeek.toDouble(),
+                    minY: 0,
+                    maxY: maxY + 10,
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: chartSpots,
+                        isCurved: true,
+                        color: Colors.blue,
+                        barWidth: 2,
+                        dotData: FlDotData(
+                          show: true,
+                          getDotPainter: (spot, percent, barData, index) {
+                            return FlDotCirclePainter(
+                              radius: 6,
+                              color: Colors.white,
+                              strokeWidth: 2,
+                              strokeColor: Colors.blue,
+                            );
+                          },
+                        ),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          color: Colors.blue.withOpacity(0.1),
+                        ),
+                      ),
+                    ],
+                    borderData: FlBorderData(show: false),
+                    gridData: const FlGridData(show: true),
+                    titlesData: FlTitlesData(
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: 1,
+                          getTitlesWidget: (value, meta) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                value.toInt().toString(),
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    ),
+                  ),
+                );
               },
             ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Container(
-          height: 220,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: LineChart(
-            LineChartData(
-              minX: 0,
-              maxX: (widget.type == ExpenseType.daily ? 6 : 3),
-              minY: 0,
-              maxY: 600000,
-              lineBarsData: [
-                LineChartBarData(
-                  spots: _getDataPoints(),
-                  isCurved: true,
-                  color: Colors.blue,
-                  barWidth: 2,
-                  dotData: FlDotData(
-                    show: true,
-                    getDotPainter: (spot, percent, barData, index) {
-                      return FlDotCirclePainter(
-                        radius: 6,
-                        color: Colors.white,
-                        strokeWidth: 2,
-                        strokeColor: Colors.blue,
-                      );
-                    },
-                  ),
-                  belowBarData: BarAreaData(
-                    show: true,
-                    color: Colors.blue.withOpacity(0.1),
-                  ),
-                ),
-              ],
-              borderData: FlBorderData(show: false),
-              gridData: const FlGridData(show: true),
-              titlesData: FlTitlesData(
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    interval: 1,
-                    getTitlesWidget: (value, meta) {
-                      if (widget.type == ExpenseType.daily) {
-                        const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            value.toInt() < days.length ? days[value.toInt()] : '',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        );
-                      } else {
-                        const weeks = ['W1', 'W2', 'W3', 'W4'];
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            value.toInt() < weeks.length ? weeks[value.toInt()] : '',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ),
-                leftTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
-
-            ),
           ),
-        )
-      ]),
+        ],
+      ),
     );
-  }
-
-  List<FlSpot> _getDataPoints() {
-    if (widget.type == ExpenseType.daily) {
-      return [
-        FlSpot(0, 500000),
-        FlSpot(1, 250000),
-        FlSpot(2, 500000),
-        FlSpot(3, 200000),
-        FlSpot(4, 250000),
-        FlSpot(5, 250000),
-        FlSpot(6, 500000),
-      ];
-    } else {
-      return [
-        FlSpot(0, 500000),
-        FlSpot(1, 250000),
-        FlSpot(2, 500000),
-        FlSpot(3, 200000),
-      ];
-    }
   }
 }
