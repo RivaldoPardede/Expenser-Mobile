@@ -26,8 +26,6 @@ class SecurityPasswordScreen extends StatefulWidget {
 }
 
 class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
-  bool isTwoFactorEnabled = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,42 +63,20 @@ class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
                   ),
                 ],
               ),
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: SvgPicture.asset(
-                      'image/two-factor.svg',
-                      placeholderBuilder: (context) =>
-                      const CircularProgressIndicator(),
-                    ),
-                    title: const Text("Two-Factor Authentication"),
-                    trailing: Switch(
-                      value: isTwoFactorEnabled,
-                      onChanged: (bool value) {
-                        setState(() {
-                          isTwoFactorEnabled = value;
-                        });
-                      },
-                    ),
-                  ),
-                  const Divider(height: 1, thickness: 1),
-                  ListTile(
-                    leading: SvgPicture.asset(
-                      'image/key.svg',
-                      placeholderBuilder: (context) =>
-                      const Icon(Icons.vpn_key),
-                    ),
-                    title: const Text("Change Password"),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () {
-                      // Navigasi ke halaman Change Pass
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ChangePass()),
-                      );
-                    },
-                  ),
-                ],
+              child: ListTile(
+                leading: SvgPicture.asset(
+                  'image/key.svg',
+                  placeholderBuilder: (context) => const Icon(Icons.vpn_key),
+                ),
+                title: const Text("Change Password"),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  // Navigasi ke halaman Change Pass
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ChangePass()),
+                  );
+                },
               ),
             ),
           ],
