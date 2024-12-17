@@ -13,20 +13,27 @@ class _financialFactorCardState extends State<financialFactorCard> {
   final FirestoreService firestoreService = FirestoreService();
   double totalIncome = 0.0;
   double totalExpenses = 0.0;
+  double totalInvestments = 0.0;
 
   double calculateIncomePercentage(Map<String, List<Map<String, dynamic>>> transactionsByDate) {
     totalIncome = 0.0;
     totalExpenses = 0.0;
+    totalInvestments = 0.0;
 
     transactionsByDate.forEach((date, transactions) {
       for (var transaction in transactions) {
         final double amount = (transaction['amount'] ?? 0.0).toDouble();
         final String type = transaction['transactionType'] ?? '';
+        final String category = transaction['category'] ?? '';
 
         if (type.toLowerCase() == 'income') {
           totalIncome += amount;
         } else if (type.toLowerCase() == 'expense') {
           totalExpenses += amount;
+        }
+
+        if (category.toLowerCase() == 'investments') {
+          totalInvestments += amount;
         }
       }
     });
@@ -43,6 +50,15 @@ class _financialFactorCardState extends State<financialFactorCard> {
     if (totalIncome > 0) {
       final percentage = (100 - (totalExpenses / (0.7 *totalIncome)) * 100);
       return percentage < 0 ? 0.0 : percentage;
+    } else {
+      return 0.0;
+    }
+  }
+
+  double calculateInvestmentPercentage() {
+    if (totalIncome > 0) {
+      final percentage = (totalInvestments / (0.1 * totalIncome)) * 100;
+      return percentage > 100 ? 100.0 : percentage;
     } else {
       return 0.0;
     }
@@ -65,17 +81,18 @@ class _financialFactorCardState extends State<financialFactorCard> {
     return StreamBuilder<Map<String, List<Map<String, dynamic>>>>(
       stream: firestoreService.getUserTransactionsGroupedByDate(),
       builder: (context, snapshot) {
-        double incomePercentage = 0.0, expensePercentage = 0.0;
+        double incomePercentage = 0.0, expensePercentage = 0.0, investmentPercentage = 0.0;
 
         if (snapshot.hasData) {
           incomePercentage = calculateIncomePercentage(snapshot.data!);
           expensePercentage = calculateExpensePercentage();
+          investmentPercentage = calculateInvestmentPercentage();
         }
 
         final factors = [
           {"label": "Savings", "percentage": "30%", "status": "Overall good", "color": Colors.yellow},
           {"label": "Expenses", "percentage": "${expensePercentage.toStringAsFixed(2)}%", "status": getStatusAndColor(expensePercentage)["status"], "color": getStatusAndColor(expensePercentage)["color"]},
-          {"label": "Investments", "percentage": "35%", "status": "So Good", "color": Colors.blue},
+          {"label": "Investments", "percentage": "${investmentPercentage.toStringAsFixed(2)}%", "status": getStatusAndColor(investmentPercentage)["status"], "color": getStatusAndColor(investmentPercentage)["color"]},
           {"label": "Income", "percentage": "${incomePercentage.toStringAsFixed(2)}%", "status": getStatusAndColor(incomePercentage)["status"], "color": getStatusAndColor(incomePercentage)["color"]},
         ];
 
