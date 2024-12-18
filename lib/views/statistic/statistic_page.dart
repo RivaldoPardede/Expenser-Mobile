@@ -65,7 +65,7 @@ class _StatisticPageState extends State<StatisticPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Good Morning, Username",
+                        "Good Morning, User",
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
