@@ -3,7 +3,9 @@ import 'package:final_project/styles/color.dart';
 import 'package:flutter/material.dart';
 
 class financialFactorCard extends StatefulWidget {
-  const financialFactorCard({super.key});
+  final Function(Map<String, double>) onFactorsUpdated;
+
+  const financialFactorCard({super.key, required this.onFactorsUpdated});
 
   @override
   State<financialFactorCard> createState() => _financialFactorCardState();
@@ -111,6 +113,15 @@ class _financialFactorCardState extends State<financialFactorCard> {
             }
 
             final savingsPercentage = calculateSavingsPercentage();
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              widget.onFactorsUpdated({
+                "income": incomePercentage,
+                "expense": expensePercentage,
+                "savings": savingsPercentage,
+                "investment": investmentPercentage,
+              });
+            });
 
             final factors = [
               {
