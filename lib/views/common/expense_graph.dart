@@ -49,8 +49,9 @@ class _ExpenseGraphState extends State<ExpenseGraph> {
   }
 
   void _updateDropdownOptions() {
+    final now = DateTime.now();
+
     if (widget.type == ExpenseType.daily) {
-      final now = DateTime.now();
       final weeks = calculateWeeksInMonth(now.year, now.month);
       dropdownOptions = List.generate(weeks.length, (index) => 'Week ${index + 1}');
     } else {
@@ -59,6 +60,7 @@ class _ExpenseGraphState extends State<ExpenseGraph> {
         'July', 'August', 'September', 'October', 'November', 'December'
       ];
     }
+
     selectedValue = dropdownOptions.first;
   }
 
@@ -66,18 +68,21 @@ class _ExpenseGraphState extends State<ExpenseGraph> {
     final userId = await FirestoreService().getCurrentUserId();
     if (userId == null) return;
 
-    final year = DateTime.now().year;
+    final now = DateTime.now();
 
     if (widget.type == ExpenseType.daily) {
-      final week = dropdownOptions.indexOf(selectedValue) + 1;
-      final month = DateTime.now().month;
+      final weekIndex = dropdownOptions.indexOf(selectedValue);
+      final year = now.year;
+      final month = now.month;
+
       setState(() {
-        expenseStream = FirestoreService().getDailyExpenses(userId, year, month, week);
+        expenseStream = FirestoreService().getDailyExpenses(userId, year, month, weekIndex + 1);
       });
     } else {
       final selectedMonth = dropdownOptions.indexOf(selectedValue) + 1;
+
       setState(() {
-        expenseStream = FirestoreService().getWeeklyExpenses(userId, year, selectedMonth);
+        expenseStream = FirestoreService().getWeeklyExpenses(userId, now.year, selectedMonth);
       });
     }
   }
@@ -150,33 +155,50 @@ class _ExpenseGraphState extends State<ExpenseGraph> {
                 final List<FlSpot> chartSpots = [];
 
                 final now = DateTime.now();
+                double minX;
+                double maxX;
 
-                final weeks = calculateWeeksInMonth(now.year, now.month);
-                final weekIndex = dropdownOptions.indexOf(selectedValue);
-                final startDayOfWeek = weeks[weekIndex]['start']!;
-                final endDayOfWeek = weeks[weekIndex]['end']!;
+                if (widget.type == ExpenseType.daily) {
+                  final weeks = calculateWeeksInMonth(now.year, now.month);
+                  final weekIndex = dropdownOptions.indexOf(selectedValue);
 
-                final Map<int, double> defaultPoints = {
-                  for (int i = startDayOfWeek; i <= endDayOfWeek; i++) i: 0.0,
-                };
+                  final startDayOfWeek = weeks[weekIndex]['start']!;
+                  final endDayOfWeek = weeks[weekIndex]['end']!;
 
-                for (var e in dataPoints) {
-                  final dayOfMonth = (e['date'] as DateTime).day;
-                  defaultPoints[dayOfMonth] = (defaultPoints[dayOfMonth] ?? 0) + (e['amount'] as double);
+                  final Map<int, double> defaultPoints = {
+                    for (int i = startDayOfWeek; i <= endDayOfWeek; i++) i: 0.0,
+                  };
+
+                  for (var e in dataPoints) {
+                    final dayOfMonth = (e['date'] as DateTime).day;
+                    if (dayOfMonth >= startDayOfWeek && dayOfMonth <= endDayOfWeek) {
+                      defaultPoints[dayOfMonth] =
+                          (defaultPoints[dayOfMonth] ?? 0) + (e['amount'] as double);
+                    }
+                  }
+
+                  defaultPoints.forEach((key, value) {
+                    chartSpots.add(FlSpot(key.toDouble(), value));
+                  });
+
+                  minX = startDayOfWeek.toDouble();
+                  maxX = endDayOfWeek.toDouble();
+                } else {
+                  for (int i = 0; i < dataPoints.length; i++) {
+                    chartSpots.add(FlSpot((i + 1).toDouble(), dataPoints[i]['amount'] as double));
+                  }
+                  minX = 1;
+                  maxX = dataPoints.length.toDouble();
                 }
 
-                defaultPoints.forEach((key, value) {
-                  chartSpots.add(FlSpot(key.toDouble(), value));
-                });
-
-                final maxY = defaultPoints.values.isNotEmpty
-                    ? defaultPoints.values.reduce((a, b) => a > b ? a : b)
+                final maxY = chartSpots.isNotEmpty
+                    ? chartSpots.map((spot) => spot.y).reduce((a, b) => a > b ? a : b)
                     : 10.0;
 
                 return LineChart(
                   LineChartData(
-                    minX: startDayOfWeek.toDouble(),
-                    maxX: endDayOfWeek.toDouble(),
+                    minX: minX,
+                    maxX: maxX,
                     minY: 0,
                     maxY: maxY + 10,
                     lineBarsData: [
@@ -210,13 +232,27 @@ class _ExpenseGraphState extends State<ExpenseGraph> {
                           showTitles: true,
                           interval: 1,
                           getTitlesWidget: (value, meta) {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                value.toInt().toString(),
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            );
+                            if (widget.type == ExpenseType.daily) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  value.toInt().toString(),
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              );
+                            } else {
+                              final weekIndex = value.toInt() - 1;
+                              if (weekIndex >= 0 && weekIndex < calculateWeeksInMonth(now.year, dropdownOptions.indexOf(selectedValue) + 1).length) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    'Week ${weekIndex + 1}',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                );
+                              }
+                            }
+                            return const SizedBox.shrink();
                           },
                         ),
                       ),

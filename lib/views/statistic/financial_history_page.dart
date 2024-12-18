@@ -1,8 +1,7 @@
+import 'package:final_project/views/common/expense_graph.dart';
 import 'package:flutter/material.dart';
-import 'widgets/weekly_expense_graph.dart';
 import 'widgets/financial_health_pie.dart';
 import 'widgets/financial_health_overview.dart';
-import 'widgets/financial_month_selector.dart';
 
 class FinancialHistoryPage extends StatelessWidget {
   const FinancialHistoryPage({super.key});
@@ -34,25 +33,8 @@ class FinancialHistoryPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Month Selector
-                  MonthSelector(
-                    months: const [
-                      'Oct',
-                      'Nov',
-                      'Des',
-                      'Jan',
-                      'Feb',
-                      'Mar',
-                    ],
-                    onMonthChanged: (selectedMonth) {
-                      debugPrint('Selected Month: $selectedMonth');
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  // Expense Graph
                   const ExpenseGraph(type: ExpenseType.weekly),
                   const SizedBox(height: 16),
-                  // Container for Pie Chart and Financial Health
                   Container(
                     padding: const EdgeInsets.all(35),
                     decoration: BoxDecoration(
@@ -67,21 +49,22 @@ class FinancialHistoryPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Pie Chart and Legend
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            children: [
-                              // Pie Chart
-                              FinancialHealthPie(),
-                              const SizedBox(height: 30),
-                              // Legend
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Pie Chart
+                            Expanded(
+                              flex: 2,
+                              child: FinancialHealthPie(),
+                            ),
+                            const SizedBox(width: 30),
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     children: [
@@ -104,7 +87,7 @@ class FinancialHistoryPage extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(width: 30),
+                                  const SizedBox(height: 10),
                                   Row(
                                     children: [
                                       Container(
@@ -117,7 +100,7 @@ class FinancialHistoryPage extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 6),
                                       const Text(
-                                        "Expends",
+                                        "Expenses",
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
@@ -128,16 +111,12 @@ class FinancialHistoryPage extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 30),
-                        // Financial Health Overview
-                        const Expanded(
-                          flex: 1,
-                          child: FinancialHealthOverview(
-                            financialHealthScore: 52.6,
-                          ),
+                        const SizedBox(height: 30),
+                        const FinancialHealthOverview(
+                          financialHealthScore: 52.6,
                         ),
                       ],
                     ),
