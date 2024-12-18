@@ -11,6 +11,27 @@ class StatisticPage extends StatefulWidget {
 }
 
 class _StatisticPageState extends State<StatisticPage> {
+  Map<String, double> factors = {
+    "income": 0.0,
+    "expense": 0.0,
+    "savings": 0.0,
+    "investment": 0.0,
+  };
+
+  void updateFactors(Map<String, double> updatedFactors) {
+    setState(() {
+      factors = updatedFactors;
+    });
+  }
+
+  double calculateFinancialHealthScore() {
+    // Terapkan formula dengan faktor terkini
+    return (0.40 * factors["income"]!) +
+        (0.25 * factors["expense"]!) +
+        (0.20 * factors["savings"]!) +
+        (0.15 * factors["investment"]!);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +65,7 @@ class _StatisticPageState extends State<StatisticPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Good Morning, Username",
+                        "Good Morning, User",
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -61,7 +82,9 @@ class _StatisticPageState extends State<StatisticPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      financialHealthScore(),
+                      financialHealthScore(
+                        score: calculateFinancialHealthScore(),
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         "Financial Health Factors",
@@ -72,7 +95,9 @@ class _StatisticPageState extends State<StatisticPage> {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      financialFactorCard(),
+                      financialFactorCard(
+                        onFactorsUpdated: updateFactors,
+                      ),
                       const SizedBox(height: 16),
                       Padding(
                         padding: const EdgeInsets.symmetric(
