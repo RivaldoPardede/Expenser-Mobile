@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'language_dialog.dart';
 import 'logout_popup.dart';
-import 'record_page.dart';
 import 'package:final_project/providers/auth_provider.dart';
 import 'security_pass.dart';
 
@@ -20,10 +18,6 @@ class Settings extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
-        ),
         title: const Text(
           'My Profile',
           style: TextStyle(color: Colors.black),
@@ -57,7 +51,7 @@ class Settings extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              username ?? 'User', // Gunakan username atau fallback ke 'User'
+                              username ?? 'User',
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -89,7 +83,6 @@ class Settings extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Card containing all Settings Options
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
