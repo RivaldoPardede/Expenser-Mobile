@@ -155,6 +155,7 @@ class FirestoreService {
           final dateString = "${date.year}-${date.month}-${date.day}";
 
           final transaction = {
+            'id': doc.id, // Add the document ID here
             'category': data['category'],
             'paymentType': data['paymentType'],
             'transactionType': data['transactionType'],
@@ -392,5 +393,86 @@ class FirestoreService {
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map((doc) => doc.data()).toList());
   }
+
+  Future<void> deleteTransaction(String transactionId) async {
+    try {
+      final transactionDoc = await _firestore.collection('transactions').doc(transactionId).get();
+
+      if (!transactionDoc.exists) {
+        throw Exception('Transaction not found');
+      }
+
+      final transactionData = transactionDoc.data()!;
+      final accountReference = transactionData['accountReference'] as DocumentReference;
+      final amount = transactionData['amount'] as double;
+      final transactionType = transactionData['transactionType'] as String;
+
+      await _firestore.collection('transactions').doc(transactionId).delete();
+
+      await _firestore.runTransaction((transaction) async {
+        final accountDoc = await transaction.get(accountReference);
+
+        if (!accountDoc.exists) {
+          throw Exception('Associated account not found');
+        }
+
+        final accountData = accountDoc.data() as Map<String, dynamic>;
+        final currentBalance = accountData['current_balance'] as double? ?? 0.0;
+
+        final balanceChange = transactionType == 'Expense' ? amount : -amount;
+        final updatedBalance = currentBalance + balanceChange;
+
+        transaction.update(accountReference, {'current_balance': updatedBalance});
+      });
+
+      if (kDebugMode) {
+        print('Transaction deleted and account balance updated successfully');
+      }
+    } catch (e) {
+      throw Exception('Failed to delete transaction: $e');
+    }
+  }
+
+  Future<void> deleteAllTransactions() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      throw Exception("User not logged in");
+    }
+
+    final accountSnapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('accounts')
+        .get();
+
+    if (accountSnapshot.docs.isEmpty) {
+      throw Exception("User has no accounts");
+    }
+
+    final accountReferences = accountSnapshot.docs.map((doc) => doc.reference).toList();
+
+    final transactionsSnapshot = await _firestore
+        .collection('transactions')
+        .where('accountReference', whereIn: accountReferences)
+        .get();
+
+    if (transactionsSnapshot.docs.isEmpty) {
+      throw Exception("No transactions found for the user");
+    }
+
+    WriteBatch batch = _firestore.batch();
+
+    for (var transactionDoc in transactionsSnapshot.docs) {
+      batch.delete(transactionDoc.reference);
+    }
+
+    await batch.commit();
+
+    if (kDebugMode) {
+      print("All transactions deleted successfully");
+    }
+  }
+
+
 
 }

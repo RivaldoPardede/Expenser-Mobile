@@ -30,8 +30,35 @@ class _TransactionPageState extends State<TransactionPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () {
-              deleteConfirmation(context);
+            onPressed: () async {
+              final result = await showDialog<bool>(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Delete All Transactions?'),
+                    content: const Text('This action cannot be undone.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (result == true) {
+                await FirestoreService().deleteAllTransactions();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('All transactions deleted.')),
+                  );
+                }
+              }
             },
           ),
         ],
@@ -59,7 +86,7 @@ class _TransactionPageState extends State<TransactionPage> {
               return Card(
                 color: Colors.white,
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
-                elevation: 4, // Box shadow
+                elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
@@ -79,16 +106,22 @@ class _TransactionPageState extends State<TransactionPage> {
                       const CustomListTileDivider(),
                       const SizedBox(height: 8),
                       ...dayTransactions.map((transaction) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: TransactionCard(
-                            title: transaction['category'] ?? 'Unknown',
-                            amount: "\$${transaction['amount'].toString()}",
-                            method: transaction['paymentType'] ?? 'Unknown',
-                            date: transaction['date'].toLocal().toString().split(' ')[0],
-                            type: transaction['transactionType'] == "Income"
-                                ? TransactionType.income
-                                : TransactionType.expense,
+                        final transactionId = transaction['id'];
+                        return GestureDetector(
+                          onLongPress: () {
+                            deleteConfirmation(context, transactionId);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: TransactionCard(
+                              title: transaction['category'] ?? 'Unknown',
+                              amount: "\$${transaction['amount'].toString()}",
+                              method: transaction['paymentType'] ?? 'Unknown',
+                              date: transaction['date'].toLocal().toString().split(' ')[0],
+                              type: transaction['transactionType'] == "Income"
+                                  ? TransactionType.income
+                                  : TransactionType.expense,
+                            ),
                           ),
                         );
                       }),
