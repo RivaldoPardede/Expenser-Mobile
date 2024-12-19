@@ -14,7 +14,7 @@ class AuthProvider with ChangeNotifier {
   String? _userEmail;
   String? get userEmail => _userEmail;
 
-  String? _username;  // Tambahkan properti username
+  String? _username;
   String? get username => _username;
 
   bool get isAuthenticated => _user != null;
@@ -43,41 +43,27 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signInWithEmailAndPassword(BuildContext context, String email, String password) async {
     try {
+      _showLoadingDialog(context); // Show loading spinner
       User? user = await _auth.signInWithEmailAndPassword(email, password);
+      Navigator.pop(context); // Dismiss loading spinner
       if (user != null) {
         _user = user;
         _userEmail = user.email;
         bool userExists = await _auth.doesUserExist(user.uid);
         bool accountsExists = await _auth.doesAccountsExist(user.uid);
 
-        if (userExists && accountsExists) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const MainScreen()),
-          );
-        } else if (userExists && !accountsExists) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const SetupCashBalance()),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
-          );
-        }
+        _navigateUser(context, userExists: userExists, accountsExists: accountsExists);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Incorrect email or password. Please check your email and password and try again.")),
-        );
+        _showSnackBar(context, "Incorrect email or password. Please check your email and password and try again.");
       }
     } catch (e) {
+      Navigator.pop(context); // Ensure spinner is dismissed on error
       _handleSignInError(context, e);
     }
   }
 
   void startEmailVerificationCheck(Function onVerified) {
-    _timer?.cancel();
+    if (_timer?.isActive == true) return; // Prevent multiple timers
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       await _auth.currentUser?.reload();
       _isEmailVerified = await _auth.checkEmailVerified();
@@ -97,34 +83,41 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
+      _showLoadingDialog(context); // Show loading spinner
       User? user = await _auth.signInWithGoogle();
+      Navigator.pop(context); // Dismiss loading spinner
       if (user != null) {
         _user = user;
         _userEmail = user.email;
         bool userExists = await _auth.doesUserExist(user.uid);
-        if (userExists) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const MainScreen()),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
-          );
-        }
+        _navigateUser(context, userExists: userExists, accountsExists: userExists); // Assume accountsExist check is handled elsewhere
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Google Sign-In failed")),
-        );
+        _showSnackBar(context, "Google Sign-In failed");
       }
     } catch (e) {
-      print("Error during Google Sign-In: $e");
-      _handleSignInError(context, e);  // Panggil error handler
+      Navigator.pop(context); // Ensure spinner is dismissed on error
+      _handleSignInError(context, e);
     }
   }
 
-
+  void _navigateUser(BuildContext context, {required bool userExists, required bool accountsExists}) {
+    if (userExists && accountsExists) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+    } else if (userExists) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SetupCashBalance()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
+      );
+    }
+  }
 
   void _handleSignInError(BuildContext context, Object e) {
     String errorMessage = "An error occurred. Please try again later.";
@@ -156,12 +149,28 @@ class AuthProvider with ChangeNotifier {
       errorMessage = e.toString();
     }
 
+    _showSnackBar(context, errorMessage, isError: true);
+  }
+
+  void _showSnackBar(BuildContext context, String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(errorMessage),
-        backgroundColor: Colors.red,
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
         duration: const Duration(seconds: 4),
       ),
+    );
+  }
+
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
     );
   }
 }

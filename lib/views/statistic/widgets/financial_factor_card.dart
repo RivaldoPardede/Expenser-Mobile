@@ -1,6 +1,7 @@
 import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/styles/color.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 class financialFactorCard extends StatefulWidget {
   final Function(Map<String, double>) onFactorsUpdated;
@@ -17,6 +18,30 @@ class _financialFactorCardState extends State<financialFactorCard> {
   double totalExpenses = 0.0;
   double totalInvestments = 0.0;
   double totalSavings = 0.0;
+  Map<String, double> lastFactors = {};
+
+  void updateParentIfNeeded(Map<String, double> updatedFactors) {
+    if (updatedFactors.toString() != lastFactors.toString()) {
+      lastFactors = updatedFactors;
+      widget.onFactorsUpdated(updatedFactors);
+    }
+  }
+
+  Stream<Map<String, dynamic>> combinedStream() {
+    final transactionsStream = firestoreService.getUserTransactionsGroupedByDate();
+    final savingsStream = firestoreService.getSavingsAccountsStream();
+
+    return Rx.combineLatest2(
+      transactionsStream,
+      savingsStream,
+          (Map<String, List<Map<String, dynamic>>> transactions, List<Map<String, dynamic>> savings) {
+        return {
+          "transactions": transactions,
+          "savings": savings,
+        };
+      },
+    );
+  }
 
   double calculateIncomePercentage(Map<String, List<Map<String, dynamic>>> transactionsByDate) {
     totalIncome = 0.0;
@@ -90,136 +115,126 @@ class _financialFactorCardState extends State<financialFactorCard> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Map<String, List<Map<String, dynamic>>>>(
-      stream: firestoreService.getUserTransactionsGroupedByDate(),
-      builder: (context, transactionSnapshot) {
-        double incomePercentage = 0.0, expensePercentage = 0.0, investmentPercentage = 0.0;
-
-        if (transactionSnapshot.hasData) {
-          incomePercentage = calculateIncomePercentage(transactionSnapshot.data!);
-          expensePercentage = calculateExpensePercentage();
-          investmentPercentage = calculateInvestmentPercentage();
+    return StreamBuilder<Map<String, dynamic>>(
+      stream: combinedStream(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: CircularProgressIndicator());
         }
 
-        return StreamBuilder<List<Map<String, dynamic>>>(
-          stream: firestoreService.getSavingsAccountsStream(),
-          builder: (context, savingsSnapshot) {
-            totalSavings = 0.0;
+        final transactions = snapshot.data!["transactions"] as Map<String, List<Map<String, dynamic>>>;
+        final savings = snapshot.data!["savings"] as List<Map<String, dynamic>>;
 
-            if (savingsSnapshot.hasData) {
-              for (var savingsAccount in savingsSnapshot.data!) {
-                totalSavings += (savingsAccount['current_balance'] as double? ?? 0.0);
-              }
-            }
+        double incomePercentage = calculateIncomePercentage(transactions);
+        double expensePercentage = calculateExpensePercentage();
+        double investmentPercentage = calculateInvestmentPercentage();
 
-            final savingsPercentage = calculateSavingsPercentage();
+        totalSavings = savings.fold(0.0, (sum, account) => sum + (account['current_balance'] as double? ?? 0.0));
+        final savingsPercentage = calculateSavingsPercentage();
 
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              widget.onFactorsUpdated({
-                "income": incomePercentage,
-                "expense": expensePercentage,
-                "savings": savingsPercentage,
-                "investment": investmentPercentage,
-              });
-            });
+        updateParentIfNeeded({
+          "income": incomePercentage,
+          "expense": expensePercentage,
+          "savings": savingsPercentage,
+          "investment": investmentPercentage,
+        });
 
-            final factors = [
-              {
-                "label": "Income",
-                "percentage": "${incomePercentage.toStringAsFixed(2)}%",
-                "status": getStatusAndColor(incomePercentage)["status"],
-                "color": getStatusAndColor(incomePercentage)["color"],
-              },
-              {
-                "label": "Savings",
-                "percentage": "${savingsPercentage.toStringAsFixed(2)}%",
-                "status": getStatusAndColor(savingsPercentage)["status"],
-                "color": getStatusAndColor(savingsPercentage)["color"],
-              },
-              {
-                "label": "Expenses",
-                "percentage": "${expensePercentage.toStringAsFixed(2)}%",
-                "status": getStatusAndColor(expensePercentage)["status"],
-                "color": getStatusAndColor(expensePercentage)["color"],
-              },
-              {
-                "label": "Investments",
-                "percentage": "${investmentPercentage.toStringAsFixed(2)}%",
-                "status": getStatusAndColor(investmentPercentage)["status"],
-                "color": getStatusAndColor(investmentPercentage)["color"],
-              },
-            ];
+        final factors = [
+          {
+            "label": "Income",
+            "percentage": "${incomePercentage.toStringAsFixed(2)}%",
+            "status": getStatusAndColor(incomePercentage)["status"],
+            "color": getStatusAndColor(incomePercentage)["color"],
+          },
+          {
+            "label": "Savings",
+            "percentage": "${savingsPercentage.toStringAsFixed(2)}%",
+            "status": getStatusAndColor(savingsPercentage)["status"],
+            "color": getStatusAndColor(savingsPercentage)["color"],
+          },
+          {
+            "label": "Expenses",
+            "percentage": "${expensePercentage.toStringAsFixed(2)}%",
+            "status": getStatusAndColor(expensePercentage)["status"],
+            "color": getStatusAndColor(expensePercentage)["color"],
+          },
+          {
+            "label": "Investments",
+            "percentage": "${investmentPercentage.toStringAsFixed(2)}%",
+            "status": getStatusAndColor(investmentPercentage)["status"],
+            "color": getStatusAndColor(investmentPercentage)["color"],
+          },
+        ];
 
-            return GridView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 2.5,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: factors.length,
-              itemBuilder: (context, index) {
-                final factor = factors[index];
-                return Card(
-                  color: lightGrey,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 7,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          color: factor["color"] as Color,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                factor["percentage"] as String,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                factor["status"] as String,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1C1C1C),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                factor["label"] as String,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+        return GridView.builder(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 2.5,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+          ),
+          itemCount: factors.length,
+          itemBuilder: (context, index) {
+            final factor = factors[index];
+            return Card(
+              color: lightGrey,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              child: Row(
+                children: [
+                  Container(
+                    width: 7,
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: factor["color"] as Color,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                   ),
-                );
-              },
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            factor["percentage"] as String,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            factor["status"] as String,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1C1C1C),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            factor["label"] as String,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         );
       },
     );
+
   }
 }

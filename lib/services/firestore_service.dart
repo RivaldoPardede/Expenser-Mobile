@@ -8,7 +8,7 @@ class FirestoreService {
 
   Future<void> saveCurrencyCode(String userId, String currencyCode) async {
     try {
-      await _firestore.collection('users').doc(userId).set({'currency_code': currencyCode,}, SetOptions(merge: true));
+      await _firestore.collection('users').doc(userId).set({'currency_code': currencyCode}, SetOptions(merge: true));
     } catch (e) {
       throw Exception('Failed to save currency code: $e');
     }
@@ -24,130 +24,107 @@ class FirestoreService {
         return null;
       }
     } catch (e) {
-      print('Error getting currency code: $e');
+      if (kDebugMode) {
+        print('Error getting currency code: $e');
+      }
       return null;
     }
   }
 
   Future<void> addAccount(String accountId, Map<String, dynamic> accountData) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    final accountRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('accounts')
-        .doc(accountId);
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) throw Exception('User not logged in');
 
-    await accountRef.set(accountData);
+      final accountRef = _firestore.collection('users').doc(userId).collection('accounts').doc(accountId);
+      await accountRef.set(accountData);
+    } catch (e) {
+      throw Exception('Failed to add account: $e');
+    }
   }
 
   Future<List<String>> getAccountIds() async {
-    List<String> accountIds = [];
-
     try {
       final user = _auth.currentUser;
-      if(user != null) {
-        final docSnapshot = await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .collection('accounts')
-            .get();
+      if (user == null) throw Exception('User not logged in');
 
-        for(var doc in docSnapshot.docs) {
-          accountIds.add(doc.id);
-        }
-
-        return accountIds;
-      }
+      final docSnapshot = await _firestore.collection('users').doc(user.uid).collection('accounts').get();
+      return docSnapshot.docs.map((doc) => doc.id).toList();
     } catch (e) {
-      print('Error fetching account IDs: $e');
+      debugPrint('Error fetching account IDs: $e');
       return [];
     }
-
-    return accountIds;
   }
 
   Future<String?> getCurrencyCodeFromAccount(String account) async {
     try {
       final user = _auth.currentUser;
-      if (user != null) {
-        final docSnapshot = await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .collection('accounts')
-            .doc(account)
-            .get();
-        return docSnapshot.data()?['currency_code'] as String?;
-      } else {
-        return null;
-      }
+      if (user == null) throw Exception('User not logged in');
+
+      final docSnapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('accounts')
+          .doc(account)
+          .get();
+      return docSnapshot.data()?['currency_code'] as String?;
     } catch (e) {
-      print('Error getting currency code: $e');
+      debugPrint('Error getting currency code: $e');
       return null;
     }
   }
 
   Future<void> addTransaction(String accountId, Map<String, dynamic> recordData) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    final recordRef = FirebaseFirestore.instance
-        .collection('transactions');
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) throw Exception('User not logged in');
 
-    final accountRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('accounts')
-        .doc(accountId);
+      final recordRef = _firestore.collection('transactions');
+      final accountRef = _firestore.collection('users').doc(userId).collection('accounts').doc(accountId);
 
-    await recordRef.add({
-      ...recordData,
-      'accountReference': accountRef,
-    });
+      await recordRef.add({
+        ...recordData,
+        'accountReference': accountRef,
+      });
+    } catch (e) {
+      throw Exception('Failed to add transaction: $e');
+    }
   }
 
   Future<void> updateAccountBalance(String accountReference, double balanceChange) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    final accountRef = FirebaseFirestore.instance
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) throw Exception('User not logged in');
+
+      final accountRef = _firestore.collection('users').doc(userId).collection('accounts').doc(accountReference);
+
+      await _firestore.runTransaction((transaction) async {
+        final snapshot = await transaction.get(accountRef);
+
+        if (!snapshot.exists) {
+          throw Exception("Account not found");
+        }
+
+        final data = snapshot.data() as Map<String, dynamic>;
+        final currentBalance = (data['current_balance'] ?? 0.0) as double;
+        final updatedBalance = currentBalance + balanceChange;
+
+        transaction.update(accountRef, {'current_balance': updatedBalance});
+      });
+    } catch (e) {
+      throw Exception('Failed to update account balance: $e');
+    }
+  }
+
+  Future<String?> getCurrentUserId() async => _auth.currentUser?.uid;
+
+  Stream<List<Map<String, dynamic>>> getAccountsStream(String userId) {
+    return _firestore
         .collection('users')
         .doc(userId)
         .collection('accounts')
-        .doc(accountReference);
-
-    print('Updating account balance for reference: $accountReference');
-
-    await FirebaseFirestore.instance.runTransaction((transaction) async {
-      DocumentSnapshot snapshot = await transaction.get(accountRef);
-
-      if (!snapshot.exists) {
-        throw Exception("Account not found");
-      }
-
-      final data = snapshot.data() as Map<String, dynamic>;
-      double currentBalance = (data['current_balance'] ?? 0.0) as double;
-      double updatedBalance = currentBalance + balanceChange;
-
-      transaction.update(accountRef, {'current_balance': updatedBalance});
-    });
-  }
-
-  Future<String?> getCurrentUserId() async {
-    final user = _auth.currentUser;
-    return user?.uid;
-  }
-
-  Stream<List<Map<String, dynamic>>> getAccountsStream(String userId) {
-    try {
-      return _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('accounts')
-          .snapshots()
-          .map((querySnapshot) {
-        return querySnapshot.docs.map((doc) {
-          return doc.data();
-        }).toList();
-      });
-    } catch (e) {
-      throw Exception('Failed to fetch accounts: $e');
-    }
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.map((doc) => doc.data()).toList());
   }
 
   Stream<Map<String, List<Map<String, dynamic>>>> getUserTransactionsGroupedByDate() {

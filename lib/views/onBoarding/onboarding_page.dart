@@ -25,34 +25,48 @@ class OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final padding = size.width * 0.05;
+
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       child: Stack(
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              Image.asset(imagePath, height: 200),
-              const SizedBox(height: 24),
+              Image.asset(
+                imagePath,
+                height: isFirstPage? size.height * 0.1 : size.height * 0.3,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(height: size.height * 0.03),
               Text(
                 title,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: size.width * 0.06,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: size.height * 0.02),
               Text(
                 subtitle,
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: size.width * 0.045,
+                  color: Colors.grey[600],
+                ),
                 textAlign: TextAlign.center,
               ),
               const Spacer(),
-              const SizedBox(height: 80),
+              SizedBox(height: size.height * 0.1),
             ],
           ),
           Positioned(
             bottom: 0,
-            right: 16,
+            right: padding,
+            left: (isFirstPage || isLastPage) ? padding : null,
             child: (isFirstPage || isLastPage)
                 ? ElevatedButton(
               style: buttonPrimary,
@@ -72,7 +86,7 @@ class OnboardingPage extends StatelessWidget {
           if (onSkip != null && !isFirstPage && !isLastPage)
             Positioned(
               bottom: 0,
-              left: 16,
+              left: padding,
               child: TextButton(
                 onPressed: onSkip,
                 child: const Text(

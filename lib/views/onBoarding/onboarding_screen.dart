@@ -39,29 +39,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       onSkip: _goToLastPage,
     ),
     OnboardingPage(
-      title: "Budget your Money",
-      subtitle: "Add monthly budgets, control unnecessary expenses.",
-      buttonText: "Next",
-      imagePath: "images/io_3.png",
-      onNext: _nextPage,
-      onSkip: _goToLastPage,
-    ),
-    OnboardingPage(
-      title: "Manage your Financial Health",
-      subtitle: "Review detailed monthly financial reports.",
-      buttonText: "Next",
-      imagePath: "images/io_4.png",
-      onNext: _nextPage,
-      onSkip: _goToLastPage,
-    ),
-    OnboardingPage(
       title: "Manage your Financial Health",
       subtitle: "Review detailed monthly financial reports.",
       buttonText: "Let’s Start",
       imagePath: "images/io_5.png",
       isLastPage: true,
       onNext: _nextPage,
-    )
+    ),
   ];
 
   void _nextPage() {
@@ -83,6 +67,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -91,7 +81,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Expanded(
             child: PageView.builder(
               controller: _controller,
-              physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (int page) {
                 setState(() {
                   _currentPage = page;
@@ -101,21 +90,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               itemBuilder: (context, index) => _pages[index],
             ),
           ),
-          if (_currentPage > 0)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_pages.length - 1, (index) {
-                return Container(
-                  margin: const EdgeInsets.all(4),
-                  width: _currentPage == index + 1 ? 12 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index + 1 ? Colors.blue : Colors.grey,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                );
-              }),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_pages.length, (index) {
+              return Container(
+                margin: const EdgeInsets.all(4),
+                width: _currentPage == index ? 12 : 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: _currentPage == index ? Colors.blue : Colors.grey,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              );
+            }),
+          ),
           const SizedBox(height: 16),
         ],
       ),
