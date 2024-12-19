@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'change_pass.dart';
-
-void main() {
-  runApp(const SecurityPass());
-}
+import 'package:provider/provider.dart';
+import 'package:final_project/providers/auth_provider.dart' as CustomAuthProvider;
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SecurityPass extends StatelessWidget {
   const SecurityPass({Key? key}) : super(key: key);
@@ -13,7 +11,7 @@ class SecurityPass extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SecurityPasswordScreen(),
+      home: const SecurityPasswordScreen(),
     );
   }
 }
@@ -26,6 +24,71 @@ class SecurityPasswordScreen extends StatefulWidget {
 }
 
 class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
+  final _firebaseAuth = FirebaseAuth.instance;
+
+  Future<void> _sendPasswordResetEmail(BuildContext context, String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Password reset email sent. Check your inbox."),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      String errorMessage = "Failed to send reset email.";
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'invalid-email':
+            errorMessage = "Invalid email address.";
+            break;
+          case 'user-not-found':
+            errorMessage = "No user found with this email.";
+            break;
+          default:
+            errorMessage = e.message ?? "An unknown error occurred.";
+        }
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  void _promptPasswordReset(BuildContext context) {
+    final authProvider = Provider.of<CustomAuthProvider.AuthProvider>(context, listen: false);
+    final emailController = TextEditingController(text: authProvider.userEmail ?? "");
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Reset Password"),
+        content: TextField(
+          controller: emailController,
+          decoration: const InputDecoration(
+            labelText: "Enter your email",
+            border: OutlineInputBorder(),
+          ),
+          keyboardType: TextInputType.emailAddress,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final email = emailController.text.trim();
+              Navigator.pop(context); // Close dialog
+              _sendPasswordResetEmail(context, email);
+            },
+            child: const Text("Reset"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,9 +102,7 @@ class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
             'image/LeftArrow.svg',
             placeholderBuilder: (context) => const Icon(Icons.arrow_back),
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -68,15 +129,9 @@ class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
                   'image/key.svg',
                   placeholderBuilder: (context) => const Icon(Icons.vpn_key),
                 ),
-                title: const Text("Change Password"),
+                title: const Text("Reset Password"),
                 trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {
-                  // Navigasi ke halaman Change Pass
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ChangePass()),
-                  );
-                },
+                onTap: () => _promptPasswordReset(context),
               ),
             ),
           ],
