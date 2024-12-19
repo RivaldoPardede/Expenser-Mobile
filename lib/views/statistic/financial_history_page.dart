@@ -80,77 +80,65 @@ class FinancialHistoryPage extends StatelessWidget {
                           ],
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            // Pie Chart
+                            FinancialHealthPie(
+                              savingsPercentage: savingsFrequency.toDouble(),
+                              expendituresPercentage: expensesFrequency.toDouble(),
+                            ),
+                            const SizedBox(height: 30),
+                            // Labels
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Pie Chart
-                                Expanded(
-                                  flex: 2,
-                                  child: FinancialHealthPie(
-                                    savingsPercentage: savingsFrequency.toDouble(),
-                                    expendituresPercentage: expensesFrequency.toDouble(),
-                                  ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 14,
+                                      height: 14,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF7BB2E8),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      "Savings",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 30),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 14,
-                                            height: 14,
-                                            decoration: const BoxDecoration(
-                                              color: Color(0xFF7BB2E8),
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          const Text(
-                                            "Savings",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
+                                const SizedBox(width: 16),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 14,
+                                      height: 14,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF114A83),
+                                        shape: BoxShape.circle,
                                       ),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 14,
-                                            height: 14,
-                                            decoration: const BoxDecoration(
-                                              color: Color(0xFF114A83),
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          const Text(
-                                            "Expenses",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ],
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      "Expenses",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                             const SizedBox(height: 30),
-                            FinancialHealthOverview(
-                              financialHealthScore: financialHealthScore,
-                            ),
+                            FinancialHealthOverview(financialHealthScore: financialHealthScore,),
                           ],
                         ),
                       ),
