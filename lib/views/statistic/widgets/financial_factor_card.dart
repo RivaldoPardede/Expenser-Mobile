@@ -1,6 +1,7 @@
 import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/styles/color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:rxdart/rxdart.dart';
 
 class financialFactorCard extends StatefulWidget {
@@ -23,7 +24,9 @@ class _financialFactorCardState extends State<financialFactorCard> {
   void updateParentIfNeeded(Map<String, double> updatedFactors) {
     if (updatedFactors.toString() != lastFactors.toString()) {
       lastFactors = updatedFactors;
-      widget.onFactorsUpdated(updatedFactors);
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        widget.onFactorsUpdated(updatedFactors);
+      });
     }
   }
 

@@ -7,28 +7,37 @@ class FinancialHealthOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Financial Health',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+    Color scoreColor;
+
+    if (financialHealthScore <= 39) {
+      scoreColor = Colors.red;
+    } else if (financialHealthScore <= 59) {
+      scoreColor = Colors.orange;
+    } else if (financialHealthScore <= 79) {
+      scoreColor = Colors.yellow;
+    } else {
+      scoreColor = Colors.blue;
+    }
+
+    return RichText(
+      text: TextSpan(
+        text: 'Financial Health: ',
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
         ),
-        const SizedBox(height: 1),
-        Text(
-          financialHealthScore.toStringAsFixed(0),
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFE41111),
+        children: [
+          TextSpan(
+            text: financialHealthScore.toStringAsFixed(0),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: scoreColor,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
