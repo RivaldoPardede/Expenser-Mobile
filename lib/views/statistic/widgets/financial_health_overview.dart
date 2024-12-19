@@ -21,7 +21,7 @@ class FinancialHealthOverview extends StatelessWidget {
         ),
         const SizedBox(height: 1),
         Text(
-          financialHealthScore.toStringAsFixed(1),
+          financialHealthScore.toStringAsFixed(0),
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

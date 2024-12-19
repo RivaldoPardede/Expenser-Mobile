@@ -108,7 +108,7 @@ class _StatisticPageState extends State<StatisticPage> {
                           onPressed: () {
                           Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const FinancialHistoryPage()),
+                          MaterialPageRoute(builder: (context) => FinancialHistoryPage(financialHealthScore: calculateFinancialHealthScore(),)),
                           );
                           },
                           style: ElevatedButton.styleFrom(

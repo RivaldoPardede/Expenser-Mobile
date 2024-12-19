@@ -5,8 +5,13 @@ enum ExpenseType { daily, weekly }
 
 class ExpenseGraph extends StatelessWidget {
   final ExpenseType type;
+  final Map<ExpenseType, List<double>> expenseData;
 
-  const ExpenseGraph({super.key, required this.type});
+  const ExpenseGraph({
+    super.key,
+    required this.type,
+    required this.expenseData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +47,9 @@ class ExpenseGraph extends StatelessWidget {
             child: LineChart(
               LineChartData(
                 minX: 0,
-                maxX: 3,
+                maxX: expenseData[type]!.length - 1,
                 minY: 0,
-                maxY: 600000,
+                maxY: expenseData[type]!.reduce((a, b) => a > b ? a : b) * 1.2,
                 lineBarsData: [
                   LineChartBarData(
                     spots: _getDataPoints(),
@@ -76,11 +81,13 @@ class ExpenseGraph extends StatelessWidget {
                       showTitles: true,
                       interval: 1,
                       getTitlesWidget: (value, meta) {
-                        const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                        final labels = type == ExpenseType.daily
+                            ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                            : ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            value.toInt() < weeks.length ? weeks[value.toInt()] : '',
+                            value.toInt() < labels.length ? labels[value.toInt()] : '',
                             style: const TextStyle(fontSize: 12),
                           ),
                         );
@@ -103,11 +110,10 @@ class ExpenseGraph extends StatelessWidget {
   }
 
   List<FlSpot> _getDataPoints() {
-    return [
-      const FlSpot(0, 500000),
-      const FlSpot(1, 250000),
-      const FlSpot(2, 500000),
-      const FlSpot(3, 550000),
-    ];
+    final expenseList = expenseData[type] ?? [];
+    return List.generate(
+      expenseList.length,
+          (index) => FlSpot(index.toDouble(), expenseList[index]),
+    );
   }
 }
