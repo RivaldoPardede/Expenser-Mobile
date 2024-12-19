@@ -6,7 +6,8 @@ import 'widgets/financial_health_pie.dart';
 import 'widgets/financial_health_overview.dart';
 
 class FinancialHistoryPage extends StatelessWidget {
-  const FinancialHistoryPage({super.key});
+  final double financialHealthScore;
+  const FinancialHistoryPage({super.key, required this.financialHealthScore});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class FinancialHistoryPage extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: StreamBuilder<List<Map<String, dynamic>>>(
-                stream: firestoreService.getAccountsStream(
+                stream: firestoreService.getUserTransactionsStream(
                     FirebaseAuth.instance.currentUser!.uid),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -50,27 +51,14 @@ class FinancialHistoryPage extends StatelessWidget {
                     );
                   }
 
-                  final accounts = snapshot.data!;
-                  double totalIncome = 0.0;
-                  double totalSavings = 0.0;
-                  double totalExpenses = 0.0;
+                  final transactions = snapshot.data!;
 
-                  for (var account in accounts) {
-                    final balance = (account['current_balance'] ?? 0.0) as double;
-                    final type = account['type'] ?? '';
-                    if (type == 'Savings') {
-                      totalSavings += balance;
-                    } else if (type == 'Expenses') {
-                      totalExpenses += balance;
-                    } else if (type == 'Income') {
-                      totalIncome += balance;
-                    }
-                  }
-
-                  final savingsPercentage =
-                  totalIncome > 0 ? (totalSavings / totalIncome) * 100 : 0.0;
-                  final expendituresPercentage =
-                  totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0.0;
+                  int savingsFrequency = transactions
+                      .where((transaction) => transaction['transactionType'] == 'Income')
+                      .length;
+                  int expensesFrequency = transactions
+                      .where((transaction) => transaction['transactionType'] == 'Expense')
+                      .length;
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,8 +89,8 @@ class FinancialHistoryPage extends StatelessWidget {
                                 Expanded(
                                   flex: 2,
                                   child: FinancialHealthPie(
-                                    savingsPercentage: savingsPercentage,
-                                    expendituresPercentage: expendituresPercentage,
+                                    savingsPercentage: savingsFrequency.toDouble(),
+                                    expendituresPercentage: expensesFrequency.toDouble(),
                                   ),
                                 ),
                                 const SizedBox(width: 30),
@@ -161,8 +149,7 @@ class FinancialHistoryPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 30),
                             FinancialHealthOverview(
-                              financialHealthScore:
-                              (savingsPercentage + expendituresPercentage) / 2,
+                              financialHealthScore: financialHealthScore,
                             ),
                           ],
                         ),

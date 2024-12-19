@@ -403,5 +403,17 @@ class FirestoreService {
       }).toList();
     });
   }
+
+  Stream<List<Map<String, dynamic>>> getUserTransactionsStream(String userId) {
+    return FirebaseFirestore.instance
+        .collection('transactions')
+        .where('accountReference', isEqualTo: FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('accounts')
+        .doc('main'))
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.map((doc) => doc.data()).toList());
+  }
+
 }
-  
