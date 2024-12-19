@@ -16,7 +16,7 @@ class ExpenseGraph extends StatefulWidget {
 class _ExpenseGraphState extends State<ExpenseGraph> {
   late String selectedValue;
   late List<String> dropdownOptions;
-  late Stream<List<Map<String, dynamic>>> expenseStream;
+  late Stream<List<Map<String, dynamic>>> expenseStream = const Stream.empty();
 
   @override
   void initState() {
