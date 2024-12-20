@@ -9,9 +9,9 @@ class SecurityPass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const SecurityPasswordScreen(),
+      home: SecurityPasswordScreen(),
     );
   }
 }
@@ -79,7 +79,7 @@ class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
           ElevatedButton(
             onPressed: () {
               final email = emailController.text.trim();
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(context);
               _sendPasswordResetEmail(context, email);
             },
             child: const Text("Reset"),
