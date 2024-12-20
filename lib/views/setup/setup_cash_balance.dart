@@ -93,91 +93,69 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false, // Prevents resizing when the keyboard appears
         appBar: AppBar(
           backgroundColor: Colors.white,
-          leading: IconButton(
-            icon: const ImageIcon(
-              AssetImage('images/LeftArrow.png'),
-              size: 32.0,
-            ),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-              );
-            },
-          ),
         ),
         body: Stack(
           children: [
             SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 70.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  const Padding(
-                    padding: EdgeInsets.only(top: 50.0),
-                    child: CustomImageHeader(
-                      headerText: "Set up your cash balance",
-                      detailText: "How much cash you have in your physical wallet?",
-                      svgPath: "images/setup_cash.svg",
+                  const CustomImageHeader(
+                    headerText: "Set up your cash balance",
+                    detailText: "How much cash you have in your physical wallet?",
+                    svgPath: "images/setup_cash.svg",
+                  ),
+                  const SizedBox(height: 30),
+                  TextFormField(
+                    textAlign: TextAlign.center,
+                    controller: currencyController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      hintText: "0",
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(
+                        fontSize: 30,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    style: const TextStyle(
+                      fontSize: 20,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 30.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Expanded(
-                          child: TextFormField(
-                            textAlign: TextAlign.center,
-                            controller: currencyController,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              hintText: "0",
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(
-                                fontSize: 30,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            style: const TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  const SizedBox(height: 60),
                 ],
               ),
             ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: buttonPrimary,
-                          onPressed: inputValue != null
-                              && double.tryParse(inputValue!.replaceAll(",", "")) != null
-                              && double.tryParse(inputValue!.replaceAll(",", ""))! >= 0
-                              ? () async {
-                            await saveAccount();
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => const AccountCreated()),
-                            );
-                          }
-                              : null,
-                          child: const Text('Finish'),
-                        ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: buttonPrimary,
+                        onPressed: inputValue != null &&
+                            double.tryParse(inputValue!.replaceAll(",", "")) != null &&
+                            double.tryParse(inputValue!.replaceAll(",", ""))! >= 0
+                            ? () async {
+                          await saveAccount();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AccountCreated()),
+                          );
+                        }
+                            : null,
+                        child: const Text('Finish'),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -186,4 +164,6 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
       ),
     );
   }
+
+
 }
