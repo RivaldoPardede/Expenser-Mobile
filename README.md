@@ -7,6 +7,7 @@
 -   [Description](#description)
 -   [Tech Stack](#tech-stack)
 -   [Design](#design)
+-   [Demo](#demo)
 -   [Compatible On](#compatible-on)
 -   [Contributors](#contributors)
 
@@ -27,6 +28,8 @@ ExpenseR is a cross-platform financial management app built with Flutter and pow
 ## Design
 Figma: <a href="https://www.figma.com/design/4enL2toOi9tpkYEUtTfnim/ExpenseR?node-id=6-300&t=oFj0DCD1RreUE9vo-1">ExpenseR Design</a>
 
+
+
 ## Demo
 Demonstration Video: <a href="https://drive.google.com/file/d/1PDzRoHcNOZC2cZnaRRJjFVGoSu8Y2GN_/view?usp=drive_link">ExpenseR Demo</a>
 
@@ -40,10 +43,10 @@ Demonstration Video: <a href="https://drive.google.com/file/d/1PDzRoHcNOZC2cZnaR
 </p>
 
 
+
 ## Contributors
 - Leader:<br>
   Rivaldo Dominggos Pardede
-
   
 - Member:<br>
   Rio Octaviannus Loka<br>
