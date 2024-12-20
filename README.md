@@ -1,5 +1,12 @@
 <p align="center"><img src="images/ilogo.png"/></p>
 <h1 align="center">ExpenseR</h1>
+<p align="center">
+  <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"/>
+  <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Google_chrome-4285F4?style=for-the-badge&logo=Google-chrome&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
+</p>
 
 ---
 
@@ -8,7 +15,6 @@
 -   [Tech Stack](#tech-stack)
 -   [Design](#design)
 -   [Demo](#demo)
--   [Compatible On](#compatible-on)
 -   [Contributors](#contributors)
 
 ---
@@ -32,17 +38,6 @@ Figma: <a href="https://www.figma.com/design/4enL2toOi9tpkYEUtTfnim/ExpenseR?nod
 
 ## Demo
 Demonstration Video: <a href="https://drive.google.com/file/d/1PDzRoHcNOZC2cZnaRRJjFVGoSu8Y2GN_/view?usp=drive_link">ExpenseR Demo</a>
-
-
-
-## Compatible On
-<p>
-  <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"/>
-  <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Google_chrome-4285F4?style=for-the-badge&logo=Google-chrome&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
-</p>
 
 
 
