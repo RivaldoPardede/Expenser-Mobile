@@ -23,7 +23,7 @@ class _SigninPageState extends State<SigninPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool isFormValid = false;
   bool isLoading = false;
-  final _secureStorage = FlutterSecureStorage();
+  final _secureStorage = const FlutterSecureStorage();
 
   @override
   void initState() {

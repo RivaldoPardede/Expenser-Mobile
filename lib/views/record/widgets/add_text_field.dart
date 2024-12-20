@@ -21,7 +21,7 @@ class AddTextField extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             titleText,
-            style: TextStyle(fontSize: 16,),
+            style: const TextStyle(fontSize: 16,),
           ),
         ),
         const SizedBox(height: 20),
@@ -36,7 +36,7 @@ class AddTextField extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 16),
-          maxLines: null, // Allows multi-line input
+          maxLines: null,
         ),
       ],
     );

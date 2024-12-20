@@ -44,7 +44,7 @@ class TopExpenseCard extends StatelessWidget {
                 color: barColors[index % barColors.length],
                 currencyCode: expense['currency_code'] ?? '',
               );
-            }).toList(),
+            }),
           ],
         );
       },

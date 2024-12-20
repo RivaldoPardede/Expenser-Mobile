@@ -50,7 +50,6 @@ class _CountrySelectionPageState extends State<CountrySelectionPage> {
                 ),
                 const SizedBox(height: 50),
 
-                // Currency Selection Button
                 SizedBox(
                   width: double.infinity,
                   height: 62,

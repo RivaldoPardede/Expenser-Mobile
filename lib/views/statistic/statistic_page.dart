@@ -25,7 +25,6 @@ class _StatisticPageState extends State<StatisticPage> {
   }
 
   double calculateFinancialHealthScore() {
-    // Terapkan formula dengan faktor terkini
     return (0.40 * factors["income"]!) +
         (0.25 * factors["expense"]!) +
         (0.20 * factors["savings"]!) +

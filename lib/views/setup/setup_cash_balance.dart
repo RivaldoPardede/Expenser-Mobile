@@ -2,8 +2,9 @@ import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/styles/button.dart';
 import 'package:final_project/views/common/custom_image_header.dart';
 import 'package:final_project/views/onBoarding/onboarding_screen.dart';
-import 'package:final_project/views/setup/turn_on_notification.dart';
+import 'package:final_project/views/setup/account_created.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:currency_textfield/currency_textfield.dart';
 
@@ -17,7 +18,7 @@ class SetupCashBalance extends StatefulWidget {
 class _SetupCashBalanceState extends State<SetupCashBalance> {
   final FirestoreService _firestoreService = FirestoreService();
   final CurrencyTextFieldController currencyController = CurrencyTextFieldController(
-    currencySymbol: "", // Placeholder, will update with Firestore value
+    currencySymbol: "",
     decimalSymbol: ".",
     thousandSymbol: ",",
     currencyOnLeft: false,
@@ -47,17 +48,23 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
           currencyController.replaceCurrencySymbol(currencyCode);
         });
       } else {
-        print("Currency code not found for the user.");
+        if (kDebugMode) {
+          print("Currency code not found for the user.");
+        }
       }
     } catch (e) {
-      print("Error fetching currency code: $e");
+      if (kDebugMode) {
+        print("Error fetching currency code: $e");
+      }
     }
   }
 
   Future<void> saveAccount() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (inputValue == null || userCurrencyCode == null) {
-      print("Incomplete data to save the account.");
+      if (kDebugMode) {
+        print("Incomplete data to save the account.");
+      }
       return;
     }
 
@@ -71,9 +78,13 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
       };
 
       await _firestoreService.addAccount("main", accountData);
-      print("Main account successfully created.");
+      if (kDebugMode) {
+        print("Main account successfully created.");
+      }
     } catch (e) {
-      print("Error saving account: $e");
+      if (kDebugMode) {
+        print("Error saving account: $e");
+      }
     }
   }
 
@@ -121,15 +132,15 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
                             controller: currencyController,
                             keyboardType: TextInputType.number,
                             decoration: const InputDecoration(
-                              hintText: "0", // Placeholder text
-                              border: InputBorder.none, // No border
+                              hintText: "0",
+                              border: InputBorder.none,
                               hintStyle: TextStyle(
-                                fontSize: 30, // Size of hint text
+                                fontSize: 30,
                                 color: Colors.grey,
                               ),
                             ),
                             style: const TextStyle(
-                              fontSize: 20, // Larger font for the entered text
+                              fontSize: 20,
                             ),
                           ),
                         ),
@@ -158,7 +169,7 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
                             await saveAccount();
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (context) => const TurnOnNotification()),
+                              MaterialPageRoute(builder: (context) => const AccountCreated()),
                             );
                           }
                               : null,

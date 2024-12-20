@@ -6,6 +6,7 @@ import 'package:final_project/views/common/modal_header.dart';
 import 'package:final_project/views/home/add_account_name.dart';
 import 'package:final_project/views/home/add_account_type.dart';
 import 'package:final_project/views/home/add_balance.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -35,10 +36,14 @@ class _AddAccountState extends State<AddAccount> {
           userCurrencyCode = currencyCode;
         });
       } else {
-        print("Currency code not found for the user.");
+        if (kDebugMode) {
+          print("Currency code not found for the user.");
+        }
       }
     } catch (e) {
-      print("Error fetching currency code: $e");
+      if (kDebugMode) {
+        print("Error fetching currency code: $e");
+      }
     }
   }
 
@@ -56,7 +61,9 @@ class _AddAccountState extends State<AddAccount> {
         return;
       }
     } catch (e) {
-      print('Error fetching account IDs: $e');
+      if (kDebugMode) {
+        print('Error fetching account IDs: $e');
+      }
       ScaffoldMessenger.of(modalContext).showSnackBar(
         const SnackBar(
           content: Text("Error checking account ID. Please try again."),
@@ -97,7 +104,9 @@ class _AddAccountState extends State<AddAccount> {
             behavior: SnackBarBehavior.floating,),
         );
       } catch (e) {
-        print("Error saving account: $e");
+        if (kDebugMode) {
+          print("Error saving account: $e");
+        }
       }
     }
   }
@@ -114,6 +123,7 @@ class _AddAccountState extends State<AddAccount> {
     );
   }
 
+  @override
   void initState() {
     super.initState();
     fetchCurrencyCode();
@@ -141,7 +151,6 @@ class _AddAccountState extends State<AddAccount> {
                 Navigator.pop(context);
               },
               onAdd: () {
-                // Navigator.pop(context);
                 _saveAccount(context);
               },
             ),

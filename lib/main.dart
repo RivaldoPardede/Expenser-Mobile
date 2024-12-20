@@ -5,12 +5,11 @@ import 'package:final_project/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'views/auth/signin_page.dart';
-import 'views/settings/settings.dart'; // Pastikan file ini sesuai
+import 'views/settings/settings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inisialisasi Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -18,7 +17,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()), // AuthProvider untuk state management
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: const MyApp(),
     ),
@@ -36,11 +35,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Inter',
       ),
-      initialRoute: '/', // Halaman awal yang akan ditampilkan
+      initialRoute: '/',
       routes: {
-        '/': (context) => const OnboardingScreen(), // Rute ke OnboardingScreen
-        '/signin_page': (context) => const SigninPage(), // Rute ke SignInPage
-        '/settings': (context) => const Settings(), // Rute ke Settings/Profile Page
+        '/': (context) => const OnboardingScreen(),
+        '/signin_page': (context) => const SigninPage(),
+        '/settings': (context) => const Settings(),
       },
     );
   }

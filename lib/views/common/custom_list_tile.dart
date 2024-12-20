@@ -55,7 +55,6 @@ class _CustomListTileState extends State<CustomListTile> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Leading Icon and Title
             Row(
               children: [
                 widget.needCircleAvatar
@@ -76,7 +75,6 @@ class _CustomListTileState extends State<CustomListTile> {
                 ),
               ],
             ),
-            // Trailing Text and Icon
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,

@@ -18,7 +18,7 @@ class ModalInputAmount extends StatelessWidget {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(width: 15,),
+          const SizedBox(width: 15,),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
             decoration: BoxDecoration(
@@ -61,19 +61,19 @@ class ModalInputAmount extends StatelessWidget {
                 }
               },
               decoration: InputDecoration(
-                hintText: (transactionType == "Expense") ? "-0" : "+0", // Placeholder text
-                border: InputBorder.none, // No border
+                hintText: (transactionType == "Expense") ? "-0" : "+0",
+                border: InputBorder.none,
                 hintStyle: TextStyle(
-                  fontSize: 60, // Size of hint text
+                  fontSize: 60,
                   color: blackPrimary,
                 ),
               ),
               style: const TextStyle(
-                fontSize: 60, // Larger font for the entered text
+                fontSize: 60,
               ),
             ),
           ),
-          SizedBox(width: 10,),
+          const SizedBox(width: 10,),
         ],
     );
   }

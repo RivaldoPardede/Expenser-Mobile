@@ -1,6 +1,7 @@
 import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/styles/color.dart';
 import 'package:final_project/views/common/modal_header.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AddBalance extends StatefulWidget {
@@ -30,10 +31,14 @@ class _AddBalanceState extends State<AddBalance> {
           userCurrencyCode = currencyCode;
         });
       } else {
-        print("Currency code not found for the user.");
+        if (kDebugMode) {
+          print("Currency code not found for the user.");
+        }
       }
     } catch (e) {
-      print("Error fetching currency code: $e");
+      if (kDebugMode) {
+        print("Error fetching currency code: $e");
+      }
     } finally {
       setState(() {
         isLoading = false;
@@ -128,7 +133,7 @@ class _AddBalanceState extends State<AddBalance> {
                       ),
                     ),
                   ),
-                SizedBox(width: 15,),
+                const SizedBox(width: 15,),
                 Expanded(
                   child: TextFormField(
                     showCursor: false,
@@ -145,15 +150,15 @@ class _AddBalanceState extends State<AddBalance> {
                       }
                     },
                     decoration: InputDecoration(
-                      hintText: "0", // Placeholder text
-                      border: InputBorder.none, // No border
+                      hintText: "0",
+                      border: InputBorder.none,
                       hintStyle: TextStyle(
-                        fontSize: 60, // Size of hint text
+                        fontSize: 60,
                         color: blackPrimary,
                       ),
                     ),
                     style: const TextStyle(
-                      fontSize: 60, // Larger font for the entered text
+                      fontSize: 60,
                     ),
                   ),
                 ),

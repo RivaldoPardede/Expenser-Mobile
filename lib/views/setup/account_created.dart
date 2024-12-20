@@ -1,7 +1,6 @@
 import 'package:final_project/styles/button.dart';
 import 'package:final_project/views/common/custom_image_header.dart';
 import 'package:final_project/views/navigation/main_screen.dart';
-import 'package:final_project/views/setup/turn_on_notification.dart';
 import 'package:flutter/material.dart';
 
 class AccountCreated extends StatelessWidget {
@@ -13,18 +12,6 @@ class AccountCreated extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const ImageIcon(
-            AssetImage('images/LeftArrow.png'),
-            size: 32.0,
-          ),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const TurnOnNotification()),
-            );
-          },
-        ),
       ),
       body: Stack(
         children: [

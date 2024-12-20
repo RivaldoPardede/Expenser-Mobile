@@ -61,7 +61,7 @@ void deleteConfirmation(BuildContext context, String transactionId) {
               ),
             ),
             onPressed: () async {
-              Navigator.pop(context); // Close the dialog
+              Navigator.pop(context);
               await FirestoreService().deleteTransaction(transactionId);
               if (kDebugMode) {
                 print('Transaction $transactionId deleted.');

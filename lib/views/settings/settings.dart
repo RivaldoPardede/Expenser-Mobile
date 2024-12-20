@@ -1,8 +1,8 @@
 import 'package:final_project/views/auth/signin_page.dart';
+import 'package:final_project/views/settings/logout_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'logout_popup.dart';
 import 'package:final_project/providers/auth_provider.dart' as CustomAuthProvider;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,16 +23,14 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _sendPasswordResetEmail(BuildContext context, String email) async {
-    final _firebaseAuth = FirebaseAuth.instance;
+    final firebaseAuth = FirebaseAuth.instance;
 
     try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      await firebaseAuth.sendPasswordResetEmail(email: email);
 
-      // Save the reset state
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('passwordReset', true);
 
-      // Show immediate success feedback
       Fluttertoast.showToast(
         msg: "Password reset email sent successfully.",
         toastLength: Toast.LENGTH_SHORT,
@@ -41,7 +39,6 @@ class _SettingsState extends State<Settings> {
         textColor: Colors.white,
       );
     } catch (e) {
-      // Handle specific error cases
       String errorMessage = "Failed to send reset email.";
       if (e is FirebaseAuthException) {
         switch (e.code) {
@@ -56,7 +53,6 @@ class _SettingsState extends State<Settings> {
         }
       }
 
-      // Show error feedback
       Fluttertoast.showToast(
         msg: errorMessage,
         toastLength: Toast.LENGTH_SHORT,
@@ -72,21 +68,19 @@ class _SettingsState extends State<Settings> {
     final passwordReset = prefs.getBool('passwordReset') ?? false;
 
     if (passwordReset) {
-      await prefs.remove('passwordReset'); // Clear the flag
+      await prefs.remove('passwordReset');
 
       try {
         await FirebaseAuth.instance.currentUser?.reload();
         final user = FirebaseAuth.instance.currentUser;
 
         if (user == null) {
-          // Log out the user
           await FirebaseAuth.instance.signOut();
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const SigninPage()),
           );
 
-          // Show success message
           Fluttertoast.showToast(
             msg: "Password changed successfully",
             toastLength: Toast.LENGTH_SHORT,
@@ -250,7 +244,7 @@ class _SettingsState extends State<Settings> {
                         height: 30,
                       ),
                       title: 'Logout',
-                      onTap: () => showLogOut(context),
+                      onTap: () => showLogOutDialog(context),
                     ),
                   ],
                 ),
