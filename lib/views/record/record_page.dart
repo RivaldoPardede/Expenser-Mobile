@@ -192,6 +192,7 @@ class _RecordPageState extends State<RecordPage> {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(29)),
       child: Scaffold(
+        backgroundColor: lightGrey,
         resizeToAvoidBottomInset: false,
         body: Padding(
           padding: EdgeInsets.only(
@@ -232,36 +233,36 @@ class _RecordPageState extends State<RecordPage> {
                   },
                 ),
                 isLoading
-                  ? Row(
-                    children: [
-                      const SizedBox(height: 100, width: 18,),
-                      Container(
-                        height: 35,
-                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 25),
-                        decoration: BoxDecoration(
-                          color: blackPrimary,
-                          borderRadius: BorderRadius.circular(56),
-                        ),
-                        child: SizedBox(
-                          width: 22,
-                          height: 30,
-                          child: CircularProgressIndicator(color: blue,),
-                        ),
+                    ? Row(
+                  children: [
+                    const SizedBox(height: 100, width: 18,),
+                    Container(
+                      height: 35,
+                      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 25),
+                      decoration: BoxDecoration(
+                        color: blackPrimary,
+                        borderRadius: BorderRadius.circular(56),
                       ),
-                    ],
-                  )
-                  : ModalInputAmount(
-                      currencyCode: userCurrencyCode,
-                      transactionType: transactionType,
-                      amountController: amountController,
+                      child: SizedBox(
+                        width: 22,
+                        height: 30,
+                        child: CircularProgressIndicator(color: blue,),
+                      ),
                     ),
+                  ],
+                )
+                    : ModalInputAmount(
+                  currencyCode: userCurrencyCode,
+                  transactionType: transactionType,
+                  amountController: amountController,
+                ),
                 const SizedBox(height: 20,),
                 const ModalSubheader(text: 'GENERAL'),
                 const SizedBox(height: 15),
                 Container(
                   decoration: BoxDecoration(
-                    color: white,
-                    borderRadius: BorderRadius.circular(9)
+                      color: white,
+                      borderRadius: BorderRadius.circular(9)
                   ),
                   child: Column(
                     children: [
@@ -290,15 +291,15 @@ class _RecordPageState extends State<RecordPage> {
                       CustomListTile(
                         icon: category.isEmpty
                             ? Icon(
-                                Icons.category,
-                                color: Colors.grey[600],
-                            )
+                          Icons.category,
+                          color: Colors.grey[600],
+                        )
                             : SvgPicture.asset(
-                                categoriesData[category]!,
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.contain,
-                            ),
+                          categoriesData[category]!,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.contain,
+                        ),
                         title: 'Category',
                         value: category.isEmpty ? 'Required' : category,
                         valueWidth: 165,
