@@ -58,13 +58,13 @@ class _CustomListTileState extends State<CustomListTile> {
             // Leading Icon and Title
             Row(
               children: [
-                widget.needCircleAvatar ?
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: isTapped ? Colors.grey[100] : Colors.grey[300],
-                    child: widget.icon
-                  )
-                : widget.icon,
+                widget.needCircleAvatar
+                    ? CircleAvatar(
+                  radius: 20,
+                  backgroundColor: isTapped ? Colors.grey[100] : Colors.grey[300],
+                  child: widget.icon,
+                )
+                    : widget.icon,
                 const SizedBox(width: 16),
                 Text(
                   widget.title,
@@ -77,43 +77,50 @@ class _CustomListTileState extends State<CustomListTile> {
               ],
             ),
             // Trailing Text and Icon
-            Row(
-              children: [
-                Container(
-                  width: widget.valueWidth,
-                  child: Text(
-                    widget.value,
-                    maxLines: 1,
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: widget.value == "Required"
-                          ? Colors.red
-                          : isTapped ? blackPrimary : Colors.grey[800],
-                      fontWeight: isTapped ? FontWeight.w700 : FontWeight.normal
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      constraints: BoxConstraints(maxWidth: widget.valueWidth),
+                      child: Text(
+                        widget.value,
+                        maxLines: 1,
+                        textAlign: TextAlign.end,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: widget.value == "Required"
+                              ? Colors.red
+                              : isTapped
+                              ? blackPrimary
+                              : Colors.grey[800],
+                          fontWeight: isTapped ? FontWeight.w700 : FontWeight.normal,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                if(widget.trailingIcon == null)
-                  const SizedBox.shrink()
-                else if(widget.trailingIcon == Icons.chevron_right)
-                  Icon(
-                    widget.trailingIcon,
-                    color: isTapped ? blackPrimary : Colors.grey[600],
-                  )
-                else
-                  CircleAvatar(
-                    radius: 15,
-                    backgroundColor: blue,
-                    child: Icon(
+                  const SizedBox(width: 8),
+                  if (widget.trailingIcon == null)
+                    const SizedBox.shrink()
+                  else if (widget.trailingIcon == Icons.chevron_right)
+                    Icon(
                       widget.trailingIcon,
-                      color: white,
+                      color: isTapped ? blackPrimary : Colors.grey[600],
+                    )
+                  else
+                    CircleAvatar(
+                      radius: 15,
+                      backgroundColor: blue,
+                      child: Icon(
+                        widget.trailingIcon,
+                        color: white,
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
