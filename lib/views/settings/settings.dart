@@ -2,16 +2,117 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'logout_popup.dart';
-import 'package:final_project/providers/auth_provider.dart';
-import 'security_pass.dart';
+import 'package:final_project/providers/auth_provider.dart' as CustomAuthProvider;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-class Settings extends StatelessWidget {
+class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
 
   @override
+  _SettingsState createState() => _SettingsState();
+}
+
+class _SettingsState extends State<Settings> {
+  @override
+  void initState() {
+    super.initState();
+    _checkPasswordResetStatus();
+  }
+
+  Future<void> _sendPasswordResetEmail(BuildContext context, String email) async {
+    final _firebaseAuth = FirebaseAuth.instance;
+
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      Fluttertoast.showToast(
+        msg: "Please Check Your Email",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.white,
+        textColor: Colors.black,
+      );
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('passwordReset', true);
+    } catch (e) {
+      String errorMessage = "Failed to send reset email.";
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'invalid-email':
+            errorMessage = "Invalid email address.";
+            break;
+          case 'user-not-found':
+            errorMessage = "No user found with this email.";
+            break;
+          default:
+            errorMessage = e.message ?? "An unknown error occurred.";
+        }
+      }
+      Fluttertoast.showToast(
+        msg: errorMessage,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _checkPasswordResetStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final passwordReset = prefs.getBool('passwordReset') ?? false;
+
+    if (passwordReset) {
+      Fluttertoast.showToast(
+        msg: "Password changed successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+      await prefs.remove('passwordReset');
+    }
+  }
+
+  void _promptPasswordReset(BuildContext context) {
+    final authProvider = Provider.of<CustomAuthProvider.AuthProvider>(context, listen: false);
+    final emailController = TextEditingController(text: authProvider.userEmail ?? "");
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Reset Password"),
+        content: TextField(
+          controller: emailController,
+          decoration: const InputDecoration(
+            labelText: "Enter your email",
+            border: OutlineInputBorder(),
+          ),
+          keyboardType: TextInputType.emailAddress,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final email = emailController.text.trim();
+              Navigator.pop(context); // Close dialog
+              _sendPasswordResetEmail(context, email);
+            },
+            child: const Text("Reset"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final userEmail = Provider.of<AuthProvider>(context).userEmail;
-    final username = Provider.of<AuthProvider>(context).username; // Ambil username
+    final userEmail = Provider.of<CustomAuthProvider.AuthProvider>(context).userEmail;
+    final username = Provider.of<CustomAuthProvider.AuthProvider>(context).username;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -100,14 +201,8 @@ class Settings extends StatelessWidget {
                           width: 30,
                           height: 30,
                         ),
-                        title: 'Security & Password',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SecurityPass()),
-                          );
-                        },
+                        title: 'Reset Password',
+                        onTap: () => _promptPasswordReset(context),
                       ),
                       const Divider(),
                       buildSettingsOption(
@@ -169,4 +264,3 @@ class Settings extends StatelessWidget {
     );
   }
 }
-
