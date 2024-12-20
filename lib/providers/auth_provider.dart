@@ -17,6 +17,9 @@ class AuthProvider with ChangeNotifier {
   String? _username;
   String? get username => _username;
 
+  String? _photoURL;
+  String? get photoURL => _photoURL;
+
   bool get isAuthenticated => _user != null;
   bool _isEmailVerified = false;
   bool get isEmailVerified => _isEmailVerified;
@@ -29,6 +32,15 @@ class AuthProvider with ChangeNotifier {
       if (_user != null) {
         _userEmail = _user?.email;
         _isEmailVerified = await _auth.checkEmailVerified();
+
+        if (_user!.providerData.isNotEmpty &&
+            _user!.providerData.first.providerId == 'google.com') {
+          _username = _user?.displayName;
+          _photoURL = _user?.photoURL;
+        } else {
+          _username = 'User';
+          _photoURL = 'images/default_profile_picture.png';
+        }
       }
       notifyListeners();
     });
@@ -43,27 +55,26 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signInWithEmailAndPassword(BuildContext context, String email, String password) async {
     try {
-      _showLoadingDialog(context); // Show loading spinner
+      _showLoadingDialog(context);
       User? user = await _auth.signInWithEmailAndPassword(email, password);
-      Navigator.pop(context); // Dismiss loading spinner
+      Navigator.pop(context);
       if (user != null) {
         _user = user;
         _userEmail = user.email;
         bool userExists = await _auth.doesUserExist(user.uid);
         bool accountsExists = await _auth.doesAccountsExist(user.uid);
-
         _navigateUser(context, userExists: userExists, accountsExists: accountsExists);
       } else {
         _showSnackBar(context, "Incorrect email or password. Please check your email and password and try again.");
       }
     } catch (e) {
-      Navigator.pop(context); // Ensure spinner is dismissed on error
+      Navigator.pop(context);
       _handleSignInError(context, e);
     }
   }
 
   void startEmailVerificationCheck(Function onVerified) {
-    if (_timer?.isActive == true) return; // Prevent multiple timers
+    if (_timer?.isActive == true) return;
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       await _auth.currentUser?.reload();
       _isEmailVerified = await _auth.checkEmailVerified();
@@ -83,19 +94,19 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
-      _showLoadingDialog(context); // Show loading spinner
+      _showLoadingDialog(context);
       User? user = await _auth.signInWithGoogle();
-      Navigator.pop(context); // Dismiss loading spinner
+      Navigator.pop(context);
       if (user != null) {
         _user = user;
         _userEmail = user.email;
         bool userExists = await _auth.doesUserExist(user.uid);
-        _navigateUser(context, userExists: userExists, accountsExists: userExists); // Assume accountsExist check is handled elsewhere
+        _navigateUser(context, userExists: userExists, accountsExists: userExists);
       } else {
         _showSnackBar(context, "Google Sign-In failed");
       }
     } catch (e) {
-      Navigator.pop(context); // Ensure spinner is dismissed on error
+      Navigator.pop(context);
       _handleSignInError(context, e);
     }
   }
@@ -136,17 +147,10 @@ class AuthProvider with ChangeNotifier {
         case 'wrong-password':
           errorMessage = "Incorrect password provided. Please try again.";
           break;
-        case 'invalid-credential':
-          errorMessage = "Incorrect email or password. Please check your email and password and try again.";
-          break;
         default:
           errorMessage = e.message ?? e.code;
           break;
       }
-    } else if (e is FormatException) {
-      errorMessage = "The email address is badly formatted.";
-    } else if (e is Exception) {
-      errorMessage = e.toString();
     }
 
     _showSnackBar(context, errorMessage, isError: true);
@@ -173,6 +177,4 @@ class AuthProvider with ChangeNotifier {
       },
     );
   }
-
-
 }

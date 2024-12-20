@@ -1,3 +1,4 @@
+import 'package:final_project/views/settings/settings.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:final_project/providers/auth_provider.dart';
 import 'package:final_project/styles/button.dart';

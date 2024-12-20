@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../auth/signin_page.dart';// Pastikan import halaman signin_page
+import '../auth/signin_page.dart';
 
 void showLogOut(BuildContext context) {
   showDialog(
@@ -7,7 +7,7 @@ void showLogOut(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: Colors.white,
-        title: const Center( // Membuat judul berada di tengah
+        title: const Center(
           child: Text(
             'Logout',
             style: TextStyle(fontWeight: FontWeight.bold),
@@ -15,22 +15,21 @@ void showLogOut(BuildContext context) {
         ),
         content: const Text(
           'The less Text People Have To Read Onscreen, The Better',
-          textAlign: TextAlign.center, // Agar konten teks berada di tengah
+          textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Menutup dialog
+              Navigator.pop(context);
             },
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Menutup dialog
-              // Gunakan Navigator.pushReplacement untuk mengganti halaman ke signin_page
+              Navigator.pop(context);
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const SigninPage()), // Pastikan SigninPage terdaftar
+                MaterialPageRoute(builder: (context) => const SigninPage()),
               );
             },
             child: const Text(

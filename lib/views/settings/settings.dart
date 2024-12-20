@@ -1,3 +1,4 @@
+import 'package:final_project/views/auth/signin_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -26,16 +27,21 @@ class _SettingsState extends State<Settings> {
 
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
-      Fluttertoast.showToast(
-        msg: "Please Check Your Email",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.white,
-        textColor: Colors.black,
-      );
+
+      // Save the reset state
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('passwordReset', true);
+
+      // Show immediate success feedback
+      Fluttertoast.showToast(
+        msg: "Password reset email sent successfully.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
     } catch (e) {
+      // Handle specific error cases
       String errorMessage = "Failed to send reset email.";
       if (e is FirebaseAuthException) {
         switch (e.code) {
@@ -49,6 +55,8 @@ class _SettingsState extends State<Settings> {
             errorMessage = e.message ?? "An unknown error occurred.";
         }
       }
+
+      // Show error feedback
       Fluttertoast.showToast(
         msg: errorMessage,
         toastLength: Toast.LENGTH_SHORT,
@@ -64,14 +72,38 @@ class _SettingsState extends State<Settings> {
     final passwordReset = prefs.getBool('passwordReset') ?? false;
 
     if (passwordReset) {
-      Fluttertoast.showToast(
-        msg: "Password changed successfully",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-      await prefs.remove('passwordReset');
+      await prefs.remove('passwordReset'); // Clear the flag
+
+      try {
+        await FirebaseAuth.instance.currentUser?.reload();
+        final user = FirebaseAuth.instance.currentUser;
+
+        if (user == null) {
+          // Log out the user
+          await FirebaseAuth.instance.signOut();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const SigninPage()),
+          );
+
+          // Show success message
+          Fluttertoast.showToast(
+            msg: "Password changed successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+          );
+        }
+      } catch (e) {
+        Fluttertoast.showToast(
+          msg: "Error checking password reset status",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
     }
   }
 
@@ -99,7 +131,7 @@ class _SettingsState extends State<Settings> {
           ElevatedButton(
             onPressed: () {
               final email = emailController.text.trim();
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(context);
               _sendPasswordResetEmail(context, email);
             },
             child: const Text("Reset"),
@@ -111,8 +143,14 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    final userEmail = Provider.of<CustomAuthProvider.AuthProvider>(context).userEmail;
-    final username = Provider.of<CustomAuthProvider.AuthProvider>(context).username;
+    final user = FirebaseAuth.instance.currentUser;
+    final isGoogleSignIn = user?.providerData.any((provider) => provider.providerId == 'google.com') ?? false;
+
+    final photoUrl = isGoogleSignIn ? user?.photoURL : null;
+    final displayName = isGoogleSignIn ? user?.displayName : null;
+
+    final username = displayName ?? 'User';
+    final userEmail = user?.email ?? 'Email not available';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -139,12 +177,14 @@ class _SettingsState extends State<Settings> {
                 ),
                 color: Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.all(7.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Row(
                     children: [
-                      const CircleAvatar(
-                        radius: 30,
-                        backgroundImage: AssetImage('images/profile.png'),
+                      CircleAvatar(
+                        radius: photoUrl != null ? 20 : 30,
+                        backgroundImage: photoUrl != null
+                            ? NetworkImage(photoUrl)
+                            : const AssetImage('images/profile.png') as ImageProvider,
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -152,14 +192,14 @@ class _SettingsState extends State<Settings> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              username ?? 'User',
+                              username,
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              userEmail ?? 'Email not available',
+                              userEmail,
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
@@ -174,7 +214,6 @@ class _SettingsState extends State<Settings> {
               ),
               const SizedBox(height: 18),
 
-              // Settings Title
               const Text(
                 'Settings',
                 style: TextStyle(
@@ -190,35 +229,30 @@ class _SettingsState extends State<Settings> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Column(
-                    children: [
-                      buildSettingsOption(
-                        context,
-                        icon: SvgPicture.asset(
-                          'images/Shield Keyhole.svg',
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: 'Reset Password',
-                        onTap: () => _promptPasswordReset(context),
+                child: Column(
+                  children: [
+                    buildSettingsOption(
+                      context,
+                      icon: SvgPicture.asset(
+                        'images/Shield Keyhole.svg',
+                        width: 30,
+                        height: 30,
                       ),
-                      const Divider(),
-                      buildSettingsOption(
-                        context,
-                        icon: SvgPicture.asset(
-                          'images/logout.svg',
-                          width: 30,
-                          height: 30,
-                        ),
-                        title: 'Logout',
-                        onTap: () {
-                          showLogOut(context);
-                        },
+                      title: 'Reset Password',
+                      onTap: () => _promptPasswordReset(context),
+                    ),
+                    const Divider(),
+                    buildSettingsOption(
+                      context,
+                      icon: SvgPicture.asset(
+                        'images/logout.svg',
+                        width: 30,
+                        height: 30,
                       ),
-                    ],
-                  ),
+                      title: 'Logout',
+                      onTap: () => showLogOut(context),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -232,35 +266,13 @@ class _SettingsState extends State<Settings> {
       BuildContext context, {
         required Widget icon,
         required String title,
-        Widget? trailing,
         VoidCallback? onTap,
       }) {
-    return InkWell(
+    return ListTile(
+      leading: icon,
+      title: Text(title, style: const TextStyle(fontSize: 16)),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            icon,
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            if (trailing != null) trailing,
-            if (trailing == null)
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Colors.grey,
-              ),
-          ],
-        ),
-      ),
     );
   }
 }
