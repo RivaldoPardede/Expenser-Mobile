@@ -23,6 +23,9 @@ jobs:
         with:
           flutter-version: '3.27.1'
           channel: 'stable'
+      - name: Decode and Save Firebase Options
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS }}" | base64 --decode > lib/firebase_options.dart
       - run: flutter pub get
       - run: flutter build apk --release
       - name: Push to Releases
