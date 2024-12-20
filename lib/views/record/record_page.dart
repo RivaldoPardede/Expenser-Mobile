@@ -13,6 +13,7 @@ import 'package:final_project/views/record/change_location.dart';
 import 'package:final_project/views/record/change_note.dart';
 import 'package:final_project/views/record/change_payee.dart';
 import 'package:final_project/views/record/change_payment_type.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -55,10 +56,14 @@ class _RecordPageState extends State<RecordPage> {
           fetchCurrencyCode(account);
         });
       } else {
-        print("No accounts found.");
+        if (kDebugMode) {
+          print("No accounts found.");
+        }
       }
     } catch (e) {
-      print('Error fetching account IDs: $e');
+      if (kDebugMode) {
+        print('Error fetching account IDs: $e');
+      }
     } finally {
       setState(() {
         isLoading = false;
@@ -74,10 +79,14 @@ class _RecordPageState extends State<RecordPage> {
           userCurrencyCode = currencyCode;
         });
       } else {
-        print("Currency code not found for the user.");
+        if (kDebugMode) {
+          print("Currency code not found for the user.");
+        }
       }
     } catch (e) {
-      print("Error fetching currency code: $e");
+      if (kDebugMode) {
+        print("Error fetching currency code: $e");
+      }
     }
   }
 
@@ -124,15 +133,17 @@ class _RecordPageState extends State<RecordPage> {
             behavior: SnackBarBehavior.floating,),
         );
       } catch (e) {
-        print("Error saving record: $e");
+        if (kDebugMode) {
+          print("Error saving record: $e");
+        }
       }
     }
   }
 
   String getFormattedTime() {
-    DateTime now = DateTime.now(); // Mendapatkan waktu saat ini
-    String formattedTime = DateFormat('HH.mm').format(now); // Format waktu
-    formattedTime = "Today " + formattedTime;
+    DateTime now = DateTime.now();
+    String formattedTime = DateFormat('HH.mm').format(now);
+    formattedTime = "Today $formattedTime";
     return formattedTime;
   }
 
@@ -220,7 +231,7 @@ class _RecordPageState extends State<RecordPage> {
                 const SizedBox(height: 40,),
                 ModalToggleSelector(
                   selectedOption: transactionType,
-                  options: ["Expense", "Income"],
+                  options: const ["Expense", "Income"],
                   onOptionSelected: (value) {
                     setState(() {
                       transactionType = value;

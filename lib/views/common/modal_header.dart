@@ -24,7 +24,6 @@ class ModalHeader extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Tombol Cancel di sisi kiri
         Align(
           alignment: Alignment.centerLeft,
           child: TextButton.icon(
@@ -40,7 +39,6 @@ class ModalHeader extends StatelessWidget {
             ),
           ),
         ),
-        // Judul di tengah
         Center(
           child: Text(
             title,
@@ -51,7 +49,6 @@ class ModalHeader extends StatelessWidget {
             ),
           ),
         ),
-        // Tombol Add di sisi kanan
         if (addText != null)
           Align(
             alignment: Alignment.centerRight,

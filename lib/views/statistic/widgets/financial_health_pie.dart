@@ -15,7 +15,7 @@ class FinancialHealthPie extends StatelessWidget {
   Widget build(BuildContext context) {
     final totalPercentage = savingsPercentage + expendituresPercentage;
 
-    return Container(
+    return SizedBox(
       height: 180,
       width: 180,
       child: PieChart(
@@ -28,8 +28,8 @@ class FinancialHealthPie extends StatelessWidget {
         ringStrokeWidth: 50,
         baseChartColor: Colors.grey[200]!,
         colorList: const [
-          Color(0xFF7BB2E8), // Savings
-          Color(0xFF114A83), // Expenditures
+          Color(0xFF7BB2E8),
+          Color(0xFF114A83),
         ],
         chartValuesOptions: ChartValuesOptions(
           showChartValueBackground: true,

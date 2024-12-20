@@ -155,7 +155,7 @@ class FirestoreService {
           final dateString = "${date.year}-${date.month}-${date.day}";
 
           final transaction = {
-            'id': doc.id, // Add the document ID here
+            'id': doc.id,
             'category': data['category'],
             'paymentType': data['paymentType'],
             'transactionType': data['transactionType'],
@@ -472,7 +472,4 @@ class FirestoreService {
       print("All transactions deleted successfully");
     }
   }
-
-
-
 }

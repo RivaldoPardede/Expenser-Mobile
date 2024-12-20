@@ -58,8 +58,8 @@ class financialHealthScore extends StatelessWidget {
                     pointers: <GaugePointer>[
                       NeedlePointer(
                         value: score, // Financial score
-                        needleColor: Color(0xFF5B9EE1),
-                        knobStyle: KnobStyle(
+                        needleColor: const Color(0xFF5B9EE1),
+                        knobStyle: const KnobStyle(
                           color: Colors.white,
                           borderColor: Color(0xFF5470C6),
                           borderWidth: 0.07,
@@ -70,8 +70,8 @@ class financialHealthScore extends StatelessWidget {
                     annotations: <GaugeAnnotation>[
                       GaugeAnnotation(
                         widget: Text(
-                          '${score.toStringAsFixed(0)}',
-                          style: TextStyle(
+                          score.toStringAsFixed(0),
+                          style: const TextStyle(
                             fontSize: 62,
                             fontWeight: FontWeight.bold,
                             color: Colors.yellow,
@@ -103,26 +103,9 @@ class financialHealthScore extends StatelessWidget {
           ],
         ),
       ),
-    );;
+    );
   }
 }
-
-// double calculateFinancialHealthScore() {
-//   // Get the percentage values for income, expenses, savings, and investments.
-//   double incomePercentage = 70.0;  // Example value, replace with your actual calculated percentage
-//   double expensePercentage = 30.0; // Example value, replace with your actual calculated percentage
-//   double savingsPercentage = 50.0; // Example value, replace with your actual calculated percentage
-//   double investmentPercentage = 40.0; // Example value, replace with your actual calculated percentage
-//
-//   // Apply the weighted formula
-//   double financialHealthScore = (0.40 * incomePercentage) +
-//       (0.25 * expensePercentage) +
-//       (0.20 * savingsPercentage) +
-//       (0.15 * investmentPercentage);
-//
-//   // Ensure the score is within the range [0, 100]
-//   return financialHealthScore.clamp(0.0, 100.0);
-// }
 
 Widget _buildScoreLegend() {
   final legendItems = [

@@ -98,7 +98,7 @@ class _financialFactorCardState extends State<financialFactorCard> {
   double calculateSavingsPercentage() {
     if (totalIncome > 0) {
       final percentage = (totalSavings / (0.2 * totalIncome)) * 100;
-      return percentage > 100 ? 100.0 : percentage; // Batas maksimum 100
+      return percentage > 100 ? 100.0 : percentage;
     } else {
       return 0.0;
     }
@@ -122,7 +122,7 @@ class _financialFactorCardState extends State<financialFactorCard> {
       stream: combinedStream(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         final transactions = snapshot.data!["transactions"] as Map<String, List<Map<String, dynamic>>>;
@@ -238,6 +238,5 @@ class _financialFactorCardState extends State<financialFactorCard> {
         );
       },
     );
-
   }
 }

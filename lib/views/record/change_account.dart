@@ -3,6 +3,7 @@ import 'package:final_project/styles/color.dart';
 import 'package:final_project/views/common/custom_list_tile.dart';
 import 'package:final_project/views/common/custom_list_tile_divider.dart';
 import 'package:final_project/views/common/modal_header.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ChangeAccount extends StatefulWidget {
@@ -31,7 +32,9 @@ class _ChangeAccountState extends State<ChangeAccount> {
         accountIds = ids;
       });
     } catch (e) {
-      print('Error fetching account IDs: $e');
+      if (kDebugMode) {
+        print('Error fetching account IDs: $e');
+      }
     } finally {
       setState(() {
         isLoading = false;
@@ -77,7 +80,7 @@ class _ChangeAccountState extends State<ChangeAccount> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox.shrink(),
+                          const SizedBox.shrink(),
                           CircularProgressIndicator(color: blue,),
                         ],
                       ),
@@ -110,7 +113,7 @@ class _ChangeAccountState extends State<ChangeAccount> {
                                 const CustomListTileDivider(),
                             ],
                           );
-                        }).toList(),
+                        }),
                         const SizedBox(height: 14,),
                       ],
               ),

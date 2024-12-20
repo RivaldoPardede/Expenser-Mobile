@@ -26,7 +26,7 @@ class _MainScreenState extends State<MainScreen> {
   late final List<NavModel> items = [
     NavModel(page: const HomePage(), navKey: homeNavKey),
     NavModel(page: const StatisticPage(), navKey: statisticNavKey),
-    NavModel(page: const RecordPage(), navKey: GlobalKey<NavigatorState>()), // FAB
+    NavModel(page: const RecordPage(), navKey: GlobalKey<NavigatorState>()),
     NavModel(page: const TransactionPage(), navKey: transactionHistoryNavKey),
     NavModel(page: const Settings(), navKey: settingsNavKey),
   ];
