@@ -47,3 +47,4 @@ Figma: <a href="https://www.figma.com/design/4enL2toOi9tpkYEUtTfnim/ExpenseR?nod
   Frederick Godiva<br>
   Dhea Tania Salsabilah Harahap<br>
   Fico Yanton Jeremia Sibagariang<br>
+  Christian Nathaniel<br>
