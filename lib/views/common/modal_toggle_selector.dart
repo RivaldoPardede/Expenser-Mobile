@@ -26,20 +26,26 @@ class ModalToggleSelector extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: options.map((option) {
           final isSelected = selectedOption == option;
-          return GestureDetector(
-            onTap: () => onOptionSelected(option),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: EdgeInsets.symmetric(horizontal: 60, vertical: 12),
-              decoration: BoxDecoration(
-                color: isSelected ? blackPrimary : Colors.transparent,
-                borderRadius: BorderRadius.circular(56),
-              ),
-              child: Text(
-                option,
-                style: TextStyle(
-                  color: isSelected ? white : blackPrimary,
-                  fontWeight: FontWeight.bold,
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onOptionSelected(option),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  color: isSelected ? blackPrimary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(56),
+                ),
+                child: Center(
+                  child: Text(
+                    option,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isSelected ? white : blackPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
