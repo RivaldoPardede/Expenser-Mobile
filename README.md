@@ -37,9 +37,11 @@ Demonstration Video: <a href="https://drive.google.com/file/d/1PDzRoHcNOZC2cZnaR
 
 ## Compatible On
 <p>
-  <img width="45" height="45" src="https://cdn.simpleicons.org/googlechrome/999999" />
-  <img src="https://skillicons.dev/icons?i=windows"/>
-  <img src="https://skillicons.dev/icons?i=linux"/>
+  <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"/>
+  <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Google_chrome-4285F4?style=for-the-badge&logo=Google-chrome&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
 </p>
 
 
