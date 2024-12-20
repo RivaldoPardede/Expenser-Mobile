@@ -13,8 +13,44 @@ class TransactionPage extends StatefulWidget {
 }
 
 class _TransactionPageState extends State<TransactionPage> {
+  String? _currencyCode;
+  bool _isLoadingCurrencyCode = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCurrencyCode();
+  }
+
+  Future<void> _fetchCurrencyCode() async {
+    try {
+      final currencyCode = await FirestoreService().getCurrencyCodeForUser();
+      if (mounted) {
+        setState(() {
+          _currencyCode = currencyCode ?? '';
+          _isLoadingCurrencyCode = false;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _isLoadingCurrencyCode = false;
+        });
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to fetch currency code: $error")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingCurrencyCode) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -115,7 +151,7 @@ class _TransactionPageState extends State<TransactionPage> {
                             padding: const EdgeInsets.only(top: 8.0),
                             child: TransactionCard(
                               title: transaction['category'] ?? 'Unknown',
-                              amount: "\$${transaction['amount'].toString()}",
+                              amount: "${_currencyCode ?? ''} ${transaction['amount'].toString()}",
                               method: transaction['paymentType'] ?? 'Unknown',
                               date: transaction['date'].toLocal().toString().split(' ')[0],
                               type: transaction['transactionType'] == "Income"
@@ -136,3 +172,4 @@ class _TransactionPageState extends State<TransactionPage> {
     );
   }
 }
+
