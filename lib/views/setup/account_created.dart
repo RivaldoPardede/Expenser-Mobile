@@ -12,8 +12,9 @@ class AccountCreated extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: Stack(
+      body: Column(
         children: [
           const Expanded(
             child: Padding(
@@ -21,40 +22,31 @@ class AccountCreated extends StatelessWidget {
               child: Center(
                 child: CustomImageHeader(
                   headerText: 'Account Created',
-                  detailText: 'Welcome! Your account is ready. Discover meaningful projects and join us on Activity',
+                  detailText:
+                  'Welcome! Your account is ready. Discover meaningful projects and join us on Activity',
                   svgPath: "images/account_created.svg",
                 ),
               ),
             ),
           ),
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: buttonPrimary,
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const MainScreen()),
-                          );
-                        },
-                        child: const Text('Continue'),
-                      ),
-                    ),
-                  ],
-                ),
+          // Button Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: buttonPrimary,
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MainScreen()),
+                  );
+                },
+                child: const Text('Continue'),
               ),
             ),
           ),
         ],
-
       ),
     );
   }
