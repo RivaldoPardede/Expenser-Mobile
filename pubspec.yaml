@@ -10,31 +10,32 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  fluttertoast: ^8.0.10
-  flutter_secure_storage: ^8.0.0
+  fluttertoast: ^9.0.0
+  flutter_secure_storage: ^10.0.0
 
-  fl_chart: ^0.64.0
-  device_preview: 1.2.0
+  fl_chart: ^1.0.0
+  device_preview: ^1.3.1
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.14
   currency_picker: ^2.0.21
-  firebase_core: ^3.7.0
-  firebase_auth: ^5.3.2
+  firebase_core: ^4.0.0
+  firebase_auth: ^6.0.0
   provider: ^6.1.2
-  cloud_firestore: ^5.5.1
-  intl: ^0.19.0
-  currency_textfield: ^4.14.1
-  google_sign_in: ^6.2.2
-  syncfusion_flutter_gauges: ^27.2.3
+  cloud_firestore: ^6.0.0
+  intl: ^0.20.2
+  currency_textfield: ^5.0.0+1
+  google_sign_in: ^7.1.1
+  syncfusion_flutter_gauges: ^32.2.7
   pie_chart: ^5.0.1
-  syncfusion_flutter_datepicker: ^27.2.5
+  syncfusion_flutter_datepicker: ^32.2.7
   rxdart: ^0.28.0
 
+  shared_preferences: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
 

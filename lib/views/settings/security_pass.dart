@@ -5,7 +5,7 @@ import 'package:final_project/providers/auth_provider.dart' as CustomAuthProvide
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SecurityPass extends StatelessWidget {
-  const SecurityPass({Key? key}) : super(key: key);
+  const SecurityPass({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class SecurityPass extends StatelessWidget {
 }
 
 class SecurityPasswordScreen extends StatefulWidget {
-  const SecurityPasswordScreen({Key? key}) : super(key: key);
+  const SecurityPasswordScreen({super.key});
 
   @override
   _SecurityPasswordScreenState createState() => _SecurityPasswordScreenState();

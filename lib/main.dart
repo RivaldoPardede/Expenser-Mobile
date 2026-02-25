@@ -2,6 +2,7 @@ import 'package:final_project/views/onBoarding/onboarding_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/providers/auth_provider.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'views/auth/signin_page.dart';
@@ -13,6 +14,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await GoogleSignIn.instance.initialize();
 
   runApp(
     MultiProvider(
@@ -41,6 +44,6 @@ class MyApp extends StatelessWidget {
         '/signin_page': (context) => const SigninPage(),
         '/settings': (context) => const Settings(),
       },
-    );
+    ); 
   }
 }

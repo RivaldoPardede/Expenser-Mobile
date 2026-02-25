@@ -5,7 +5,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class Auth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+
+  
 
   User? get currentUser => _firebaseAuth.currentUser;
 
@@ -18,7 +20,7 @@ class Auth {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       await _firebaseAuth.currentUser?.sendEmailVerification();
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       rethrow;
     } catch (e) {
       throw Exception("An unexpected error occurred during sign-up: $e");
@@ -32,7 +34,7 @@ class Auth {
         password: password,
       );
       return userCredential.user;
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       rethrow;
     } catch (e) {
       throw Exception("An unexpected error occurred during email sign-in: $e");
@@ -53,27 +55,17 @@ class Auth {
 
   Future<User?> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        if (kDebugMode) {
-          print("Google Sign-In aborted by user.");
-        }
-        return null;
-      }
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
 
-      final GoogleSignInAuthentication? googleAuth = await googleUser.authentication;
-      if (googleAuth == null) {
-        throw Exception("Failed to authenticate with Google.");
-      }
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
       final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
       return userCredential.user;
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       rethrow;
     } catch (e) {
       if (kDebugMode) {
@@ -113,7 +105,7 @@ class Auth {
 
   Future<void> signOut() async {
     try {
-      await _googleSignIn.signOut();
+      await _googleSignIn.disconnect();
       await _firebaseAuth.signOut();
     } catch (e) {
       if (kDebugMode) {

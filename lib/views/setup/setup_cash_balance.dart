@@ -1,7 +1,6 @@
 import 'package:final_project/services/firestore_service.dart';
 import 'package:final_project/styles/button.dart';
 import 'package:final_project/views/common/custom_image_header.dart';
-import 'package:final_project/views/onBoarding/onboarding_screen.dart';
 import 'package:final_project/views/setup/account_created.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
