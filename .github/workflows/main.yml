@@ -42,6 +42,18 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Ensure Firebase options are available for analysis
+        env:
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+        run: |
+          if [ ! -f lib/firebase_options.dart ]; then
+            if [ -z "$FIREBASE_OPTIONS" ]; then
+              echo "lib/firebase_options.dart is missing and FIREBASE_OPTIONS secret is not configured."
+              exit 1
+            fi
+            echo "$FIREBASE_OPTIONS" | base64 --decode > lib/firebase_options.dart
+          fi
+
       - name: Analyze code
         run: flutter analyze --no-fatal-infos
 
@@ -91,8 +103,17 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Decode Firebase options secret
-        run: echo "${{ secrets.FIREBASE_OPTIONS }}" | base64 --decode > lib/firebase_options.dart
+      - name: Ensure Firebase options are available for build
+        env:
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+        run: |
+          if [ ! -f lib/firebase_options.dart ]; then
+            if [ -z "$FIREBASE_OPTIONS" ]; then
+              echo "lib/firebase_options.dart is missing and FIREBASE_OPTIONS secret is not configured."
+              exit 1
+            fi
+            echo "$FIREBASE_OPTIONS" | base64 --decode > lib/firebase_options.dart
+          fi
 
       - name: Install dependencies
         run: flutter pub get
