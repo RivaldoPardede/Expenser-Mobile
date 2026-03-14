@@ -3,7 +3,7 @@ import 'package:final_project/views/settings/logout_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:final_project/providers/auth_provider.dart' as CustomAuthProvider;
+import 'package:final_project/providers/auth_provider.dart' as custom_auth_provider;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -12,14 +12,14 @@ class Settings extends StatefulWidget {
   const Settings({super.key});
 
   @override
-  _SettingsState createState() => _SettingsState();
+  State<Settings> createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
   @override
   void initState() {
     super.initState();
-    _checkPasswordResetStatus();
+    _checkPasswordResetStatus(context);
   }
 
   Future<void> _sendPasswordResetEmail(BuildContext context, String email) async {
@@ -63,46 +63,51 @@ class _SettingsState extends State<Settings> {
     }
   }
 
-  Future<void> _checkPasswordResetStatus() async {
+  Future<void> _checkPasswordResetStatus(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final passwordReset = prefs.getBool('passwordReset') ?? false;
 
-    if (passwordReset) {
-      await prefs.remove('passwordReset');
+    if (!passwordReset) return;
 
-      try {
-        await FirebaseAuth.instance.currentUser?.reload();
-        final user = FirebaseAuth.instance.currentUser;
+    await prefs.remove('passwordReset');
 
-        if (user == null) {
-          await FirebaseAuth.instance.signOut();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const SigninPage()),
-          );
-
-          Fluttertoast.showToast(
-            msg: "Password changed successfully",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-          );
-        }
-      } catch (e) {
-        Fluttertoast.showToast(
-          msg: "Error checking password reset status",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-        );
+    bool shouldNavigate = false;
+    try {
+      await FirebaseAuth.instance.currentUser?.reload();
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        await FirebaseAuth.instance.signOut();
+        shouldNavigate = true;
       }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Error checking password reset status",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    if (shouldNavigate) {
+      if (!context.mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SigninPage()),
+      );
+      Fluttertoast.showToast(
+        msg: "Password changed successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
     }
   }
 
   void _promptPasswordReset(BuildContext context) {
-    final authProvider = Provider.of<CustomAuthProvider.AuthProvider>(context, listen: false);
+    final authProvider = Provider.of<custom_auth_provider.AuthProvider>(context, listen: false);
     final emailController = TextEditingController(text: authProvider.userEmail ?? "");
 
     showDialog(

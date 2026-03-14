@@ -26,7 +26,7 @@ class TotalBalanceCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             blurRadius: 10,
             spreadRadius: 2,
             offset: const Offset(0, 3),

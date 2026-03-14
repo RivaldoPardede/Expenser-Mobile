@@ -4,10 +4,10 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../../styles/color.dart';
 
-class financialHealthScore extends StatelessWidget {
+class FinancialHealthScore extends StatelessWidget {
   final double score;
 
-  const financialHealthScore({super.key, required this.score});
+  const FinancialHealthScore({super.key, required this.score});
 
   @override
   Widget build(BuildContext context) {

@@ -41,7 +41,7 @@ class TopExpenseBarItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           child: Container(
             height: 24,
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             child: Row(
               children: [
                 AnimatedContainer(

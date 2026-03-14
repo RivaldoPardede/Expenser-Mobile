@@ -50,7 +50,7 @@ class _AddAccountState extends State<AddAccount> {
   Future<void> _saveAccount(BuildContext modalContext) async {
     try {
       List<String> accountNames = await _firestoreService.getAccountIds();
-
+      if (!modalContext.mounted) return;
       if (accountNames.contains(accountName)) {
         ScaffoldMessenger.of(modalContext).showSnackBar(
           const SnackBar(
@@ -64,6 +64,7 @@ class _AddAccountState extends State<AddAccount> {
       if (kDebugMode) {
         print('Error fetching account IDs: $e');
       }
+      if (!modalContext.mounted) return;
       ScaffoldMessenger.of(modalContext).showSnackBar(
         const SnackBar(
           content: Text("Error checking account ID. Please try again."),
@@ -97,6 +98,7 @@ class _AddAccountState extends State<AddAccount> {
         };
 
         await _firestoreService.addAccount(accountData["account_name"].toString(), accountData);
+        if (!modalContext.mounted) return;
         Navigator.pop(modalContext);
 
         ScaffoldMessenger.of(modalContext).showSnackBar(

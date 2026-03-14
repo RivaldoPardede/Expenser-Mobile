@@ -57,17 +57,20 @@ class AuthProvider with ChangeNotifier {
     try {
       _showLoadingDialog(context);
       User? user = await _auth.signInWithEmailAndPassword(email, password);
+      if (!context.mounted) return;
       Navigator.pop(context);
       if (user != null) {
         _user = user;
         _userEmail = user.email;
         bool userExists = await _auth.doesUserExist(user.uid);
         bool accountsExists = await _auth.doesAccountsExist(user.uid);
+        if (!context.mounted) return;
         _navigateUser(context, userExists: userExists, accountsExists: accountsExists);
       } else {
         _showSnackBar(context, "Incorrect email or password. Please check your email and password and try again.");
       }
     } catch (e) {
+      if (!context.mounted) return;
       Navigator.pop(context);
       _handleSignInError(context, e);
     }
@@ -96,16 +99,19 @@ class AuthProvider with ChangeNotifier {
     try {
       _showLoadingDialog(context);
       User? user = await _auth.signInWithGoogle();
+      if (!context.mounted) return;
       Navigator.pop(context);
       if (user != null) {
         _user = user;
         _userEmail = user.email;
         bool userExists = await _auth.doesUserExist(user.uid);
+        if (!context.mounted) return;
         _navigateUser(context, userExists: userExists, accountsExists: userExists);
       } else {
         _showSnackBar(context, "Google Sign-In failed");
       }
     } catch (e) {
+      if (!context.mounted) return;
       Navigator.pop(context);
       _handleSignInError(context, e);
     }

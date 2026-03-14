@@ -22,7 +22,7 @@ class CustomListTile extends StatefulWidget {
   });
 
   @override
-  _CustomListTileState createState() => _CustomListTileState();
+  State<CustomListTile> createState() => _CustomListTileState();
 }
 
 class _CustomListTileState extends State<CustomListTile> {

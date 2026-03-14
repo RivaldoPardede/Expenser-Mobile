@@ -12,7 +12,7 @@ class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
-  _MainScreenState createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
@@ -33,13 +33,13 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (didPop) return;
         if (items[selectedTab].navKey.currentState?.canPop() ?? false) {
           items[selectedTab].navKey.currentState?.pop();
-          return false;
         }
-        return true;
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,

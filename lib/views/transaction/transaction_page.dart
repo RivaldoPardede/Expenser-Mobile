@@ -19,27 +19,25 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   void initState() {
     super.initState();
-    _fetchCurrencyCode();
+    _fetchCurrencyCode(context);
   }
 
-  Future<void> _fetchCurrencyCode() async {
+  Future<void> _fetchCurrencyCode(BuildContext context) async {
     try {
       final currencyCode = await FirestoreService().getCurrencyCodeForUser();
-      if (mounted) {
-        setState(() {
-          _currencyCode = currencyCode ?? '';
-          _isLoadingCurrencyCode = false;
-        });
-      }
+      if (!context.mounted) return;
+      setState(() {
+        _currencyCode = currencyCode ?? '';
+        _isLoadingCurrencyCode = false;
+      });
     } catch (error) {
-      if (mounted) {
-        setState(() {
-          _isLoadingCurrencyCode = false;
-        });
-      }
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to fetch currency code: $error")),
       );
+      setState(() {
+        _isLoadingCurrencyCode = false;
+      });
     }
   }
 
@@ -89,11 +87,10 @@ class _TransactionPageState extends State<TransactionPage> {
 
               if (result == true) {
                 await FirestoreService().deleteAllTransactions();
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('All transactions deleted.')),
-                  );
-                }
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('All transactions deleted.')),
+                );
               }
             },
           ),

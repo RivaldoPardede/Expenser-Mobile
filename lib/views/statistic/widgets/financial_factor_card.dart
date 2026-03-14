@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:rxdart/rxdart.dart';
 
-class financialFactorCard extends StatefulWidget {
+class FinancialFactorCard extends StatefulWidget {
   final Function(Map<String, double>) onFactorsUpdated;
 
-  const financialFactorCard({super.key, required this.onFactorsUpdated});
+  const FinancialFactorCard({super.key, required this.onFactorsUpdated});
 
   @override
-  State<financialFactorCard> createState() => _financialFactorCardState();
+  State<FinancialFactorCard> createState() => _FinancialFactorCardState();
 }
 
-class _financialFactorCardState extends State<financialFactorCard> {
+class _FinancialFactorCardState extends State<FinancialFactorCard> {
   final FirestoreService firestoreService = FirestoreService();
   double totalIncome = 0.0;
   double totalExpenses = 0.0;

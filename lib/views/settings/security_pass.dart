@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:final_project/providers/auth_provider.dart' as CustomAuthProvider;
+import 'package:final_project/providers/auth_provider.dart' as custom_auth_provider;
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SecurityPass extends StatelessWidget {
@@ -20,7 +20,7 @@ class SecurityPasswordScreen extends StatefulWidget {
   const SecurityPasswordScreen({super.key});
 
   @override
-  _SecurityPasswordScreenState createState() => _SecurityPasswordScreenState();
+  State<SecurityPasswordScreen> createState() => _SecurityPasswordScreenState();
 }
 
 class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
@@ -29,6 +29,7 @@ class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
   Future<void> _sendPasswordResetEmail(BuildContext context, String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Password reset email sent. Check your inbox."),
@@ -49,6 +50,7 @@ class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
             errorMessage = e.message ?? "An unknown error occurred.";
         }
       }
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
       );
@@ -56,7 +58,7 @@ class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
   }
 
   void _promptPasswordReset(BuildContext context) {
-    final authProvider = Provider.of<CustomAuthProvider.AuthProvider>(context, listen: false);
+    final authProvider = Provider.of<custom_auth_provider.AuthProvider>(context, listen: false);
     final emailController = TextEditingController(text: authProvider.userEmail ?? "");
 
     showDialog(
@@ -117,7 +119,7 @@ class _SecurityPasswordScreenState extends State<SecurityPasswordScreen> {
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: Colors.grey.withValues(alpha: 0.2),
                     spreadRadius: 2,
                     blurRadius: 5,
                     offset: const Offset(0, 3),

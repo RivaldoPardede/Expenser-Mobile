@@ -77,7 +77,7 @@ class _AddAccountTypeState extends State<AddAccountType> {
                         duration: const Duration(milliseconds: 100,),
                         decoration: BoxDecoration(
                           color: paymentMethods[index] == selectedPayment
-                              ? Colors.blue.withOpacity(0.1)
+                              ? Colors.blue.withValues(alpha: 0.1)
                               : Colors.transparent,
                         ),
                         child: ListTile(

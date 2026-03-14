@@ -126,6 +126,7 @@ class _RecordPageState extends State<RecordPage> {
         String accountRef = recordData["account"].toString();
         double balanceChange = transactionType == "Income" ? amount! : -amount!;
         await _firestoreService.updateAccountBalance(accountRef, balanceChange);
+        if (!modalContext.mounted) return;
         Navigator.pop(modalContext);
 
         ScaffoldMessenger.of(modalContext).showSnackBar(
@@ -406,10 +407,10 @@ class _RecordPageState extends State<RecordPage> {
                         valueWidth: 130,
                         needCircleAvatar: true,
                         onTap: () async {
-                          final Location = await _showBottomModal(context, ChangeLocation(location: location,));
-                          if (Location != null) {
+                          final newLocation = await _showBottomModal(context, ChangeLocation(location: location,));
+                          if (newLocation != null) {
                             setState(() {
-                              location = Location;
+                              location = newLocation;
                             });
                           }
                         },

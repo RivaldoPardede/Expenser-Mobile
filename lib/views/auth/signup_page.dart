@@ -121,6 +121,7 @@ class _SignupPageState extends State<SignupPage> {
                           setState(() {
                             isLoading = false;
                           });
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("Verification email sent! Please check your inbox."),
@@ -128,6 +129,7 @@ class _SignupPageState extends State<SignupPage> {
                             ),
                           );
                           authProvider.startEmailVerificationCheck(() {
+                            if (!context.mounted) return;
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (context) => const CountrySelectionPage()),
@@ -149,6 +151,7 @@ class _SignupPageState extends State<SignupPage> {
                           setState(() {
                             isLoading = false;
                           });
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(errorMessage!),
@@ -160,6 +163,7 @@ class _SignupPageState extends State<SignupPage> {
                           setState(() {
                             isLoading = false;
                           });
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("Failed to sign up: ${e.toString()}"),

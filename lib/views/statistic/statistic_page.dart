@@ -81,7 +81,7 @@ class _StatisticPageState extends State<StatisticPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      financialHealthScore(
+                      FinancialHealthScore(
                         score: calculateFinancialHealthScore(),
                       ),
                       const SizedBox(height: 16),
@@ -94,7 +94,7 @@ class _StatisticPageState extends State<StatisticPage> {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      financialFactorCard(
+                      FinancialFactorCard(
                         onFactorsUpdated: updateFactors,
                       ),
                       const SizedBox(height: 16),

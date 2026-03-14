@@ -95,12 +95,12 @@ class _ExpenseGraphState extends State<ExpenseGraph> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.2),
+          color: Colors.grey.withValues(alpha: 0.2),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             spreadRadius: 2,
             blurRadius: 10,
             offset: const Offset(0, 2),
@@ -220,7 +220,7 @@ class _ExpenseGraphState extends State<ExpenseGraph> {
                         ),
                         belowBarData: BarAreaData(
                           show: true,
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withValues(alpha: 0.1),
                         ),
                       ),
                     ],

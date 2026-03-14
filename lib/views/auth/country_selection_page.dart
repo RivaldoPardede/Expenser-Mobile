@@ -11,7 +11,7 @@ class CountrySelectionPage extends StatefulWidget {
   const CountrySelectionPage({super.key});
 
   @override
-  _CountrySelectionPageState createState() => _CountrySelectionPageState();
+  State<CountrySelectionPage> createState() => _CountrySelectionPageState();
 }
 
 class _CountrySelectionPageState extends State<CountrySelectionPage> {
@@ -57,7 +57,7 @@ class _CountrySelectionPageState extends State<CountrySelectionPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       elevation: 10,
-                      shadowColor: Colors.grey.withOpacity(0.5),
+                      shadowColor: Colors.grey.withValues(alpha: 0.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(56),
                       ),
@@ -104,12 +104,13 @@ class _CountrySelectionPageState extends State<CountrySelectionPage> {
                 if (userId != null && selectedCurrency != null) {
                   try {
                     await _firestoreService.saveCurrencyCode(userId, selectedCurrency!.code);
-
+                    if (!context.mounted) return;
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => const SetupCashBalance()),
                     );
                   } catch (e) {
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text("Failed to save currency: ${e.toString()}"),

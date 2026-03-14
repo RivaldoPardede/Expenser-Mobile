@@ -145,6 +145,7 @@ class _SetupCashBalanceState extends State<SetupCashBalance> {
                             double.tryParse(inputValue!.replaceAll(",", ""))! >= 0
                             ? () async {
                           await saveAccount();
+                          if (!context.mounted) return;
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => const AccountCreated()),

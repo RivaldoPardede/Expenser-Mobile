@@ -33,7 +33,7 @@ class FinancialHealthPie extends StatelessWidget {
         ],
         chartValuesOptions: ChartValuesOptions(
           showChartValueBackground: true,
-          chartValueBackgroundColor: const Color(0xFFFFFFFF).withOpacity(0.67),
+          chartValueBackgroundColor: const Color(0xFFFFFFFF).withValues(alpha: 0.67),
           showChartValuesInPercentage: true,
           showChartValuesOutside: false,
           chartValueStyle: const TextStyle(
