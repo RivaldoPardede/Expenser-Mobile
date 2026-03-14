@@ -1,36 +1,165 @@
+name: Build & Release
+
+# ─── Triggers ────────────────────────────────────────────────────────────────
 on:
-  pull_request:
-    branches:
-      - main
-      - master
   push:
     branches:
       - main
       - master
-      - develop
-name: "Build & Release"
+
+# ─── Jobs ────────────────────────────────────────────────────────────────────
 jobs:
-  build:
-    name: Build & Release
-    runs-on: macos-latest
+
+  # ── 1. Test ─────────────────────────────────────────────────────────────────
+  test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3.12.0
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17 (Temurin)
+        uses: actions/setup-java@v4
         with:
-          distribution: 'oracle'
+          distribution: 'temurin'
           java-version: '17'
-      - uses: subosito/flutter-action@v2
+
+      - name: Cache Flutter pub packages
+        uses: actions/cache@v4
         with:
-          flutter-version: '3.27.1'
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-flutter-
+
+      - name: Set up Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
           channel: 'stable'
-      - name: Decode and Save Firebase Options
-        run: |
-          echo "${{ secrets.FIREBASE_OPTIONS }}" | base64 --decode > lib/firebase_options.dart
-      - run: flutter pub get
-      - run: flutter build apk --release
-      - name: Push to Releases
-        uses: ncipollo/release-action@v1
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test
+
+  # ── 2. Build & Release ──────────────────────────────────────────────────────
+  build_and_release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    needs: test          # only runs after test passes
+    permissions:
+      contents: write    # required to create a GitHub Release
+
+    steps:
+      - name: Checkout repository (full history for release notes)
+        uses: actions/checkout@v4
         with:
-          artifacts: "build/app/outputs/flutter-apk/*"
-          tag: v1.0.${{ github.run_number }}
+          fetch-depth: 0
+
+      - name: Set up Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Flutter pub packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-flutter-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Set up Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Decode Firebase options secret
+        run: echo "${{ secrets.FIREBASE_OPTIONS }}" | base64 --decode > lib/firebase_options.dart
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # ── Extract version & build number from pubspec.yaml ──────────────────
+      - name: Extract version from pubspec.yaml
+        id: version
+        run: |
+          RAW=$(grep '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//' | tr -d '[:space:]')
+          APP_VERSION=$(echo "$RAW" | cut -d'+' -f1)
+          BUILD_NUMBER=$(echo "$RAW" | cut -d'+' -f2)
+          echo "app_version=$APP_VERSION"   >> $GITHUB_OUTPUT
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+          echo "tag=v$APP_VERSION"          >> $GITHUB_OUTPUT
+          echo "▶ App version : $APP_VERSION"
+          echo "▶ Build number: $BUILD_NUMBER"
+          echo "▶ Git tag     : v$APP_VERSION"
+
+      # ── Build ──────────────────────────────────────────────────────────────
+      - name: Build split APKs (per ABI — smaller downloads)
+        run: |
+          flutter build apk --release \
+            --split-per-abi \
+            --obfuscate \
+            --split-debug-info=build/app/outputs/symbols
+
+      - name: Build universal APK (all architectures)
+        run: |
+          flutter build apk --release \
+            --obfuscate \
+            --split-debug-info=build/app/outputs/symbols
+
+      # ── Release ────────────────────────────────────────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "Release ${{ steps.version.outputs.tag }}"
+          body: |
+            ## 📦 Release ${{ steps.version.outputs.tag }}
+
+            | Field | Value |
+            |---|---|
+            | **App Version** | `${{ steps.version.outputs.app_version }}` |
+            | **Build Number** | `${{ steps.version.outputs.build_number }}` |
+            | **Commit** | [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) |
+            | **Branch** | `${{ github.ref_name }}` |
+            | **Triggered by** | @${{ github.actor }} |
+
+            ---
+
+            ### 📲 Download
+
+            | APK | Target devices |
+            |---|---|
+            | `app-arm64-v8a-release.apk` | ✅ Recommended — modern 64-bit ARM (most phones) |
+            | `app-armeabi-v7a-release.apk` | Older 32-bit ARM devices |
+            | `app-x86_64-release.apk` | x86 emulators / Intel devices |
+            | `app-release.apk` | Universal — all architectures (largest file) |
+
+            ---
+
+          generate_release_notes: true   # appends auto-generated commit changelog
+          make_latest: true
+          files: |
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
+            build/app/outputs/flutter-apk/app-release.apk
           token: ${{ secrets.TOKEN }}
